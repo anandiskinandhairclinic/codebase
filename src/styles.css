@@ -1,0 +1,372 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-brand-teal: var(--brand-teal);
+  --color-brand-emerald: var(--brand-emerald);
+  --color-brand-lavender: var(--brand-lavender);
+  --color-brand-frost: var(--brand-frost);
+  --color-brand-deep: var(--brand-deep);
+}
+
+:root {
+  --radius: 1.125rem;
+  /* Pro-Designed High-Contrast Rose Gold & Onyx Black Skincare Palette */
+  --background: #FAF7F5;          /* Warm Alabaster White clean background */
+  --foreground: #333333;          /* Highly readable charcoal body text */
+  --card: #FFFFFF;                /* Pristine White Card Background */
+  --card-foreground: #333333;     /* Highly readable charcoal body text */
+  --popover: #FFFFFF;             /* Pristine White Card Background */
+  --popover-foreground: #333333;  /* Highly readable charcoal body text */
+
+  /* Primary Accent / CTA Buttons: Wisteria Plum-Taupe */
+  --primary: #6C5350;             /* Primary Accent (Muted Wisteria Plum-Taupe) */
+  --primary-foreground: #FFFFFF;  /* White Text */
+
+  /* Secondary: Champagne Rose Gold (#f7d8d2), Wisteria Plum-Taupe text */
+  --secondary: #f7d8d2;           /* Secondary Background */
+  --secondary-foreground: #6C5350; /* Wisteria Plum-Taupe Text */
+  
+  --muted: #f7d8d2;               /* Secondary Background */
+  --muted-foreground: #666666;    /* Text Secondary */
+
+  /* Accent & Highlight Tints */
+  --accent: #FFF0ED;              /* Warm light rose tint highlight */
+  --accent-foreground: #D29082;   /* Polished Rose Gold Accent */
+
+  /* Feedback Colors */
+  --destructive: #E53935;
+  --destructive-foreground: #FFFFFF;
+
+  --border: #EAD5D2;              /* Subtle Warm Borders */
+  --input: #FFFFFF;               /* White Forms Background */
+  --ring: #6C5350;                /* Wisteria Focus indicator */
+
+  --chart-1: #6C5350;
+  --chart-2: #D29082;
+  --chart-3: #f7d8d2;
+  --chart-4: #333333;
+  --chart-5: #128C7E;
+
+  --sidebar: #FAF7F5;
+  --sidebar-foreground: #333333;
+  --sidebar-primary: #6C5350;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #f7d8d2;
+  --sidebar-accent-foreground: #6C5350;
+  --sidebar-border: #EAD5D2;
+  --sidebar-ring: #6C5350;
+
+  /* Brand tokens */
+  --brand-teal: #6C5350;          /* Primary Accent (Muted Wisteria Plum-Taupe) */
+  --brand-emerald: #D29082;       /* Polished Rose Gold Accent */
+  --brand-lavender: #121212;      /* Onyx Black */
+  --brand-frost: #f7d8d2;         /* Champagne Rose Gold */
+  --brand-deep: #121212;          /* Heading Color (Rich Onyx Black) */
+  --brand-mint: #128C7E;          /* Polished Jade (WhatsApp green) */
+  --brand-blush: #EAD5D2;         /* Fine rose gold gray border/accent */
+}
+
+.dark {
+  --background: #121212;          /* Rich dark Onyx Black background */
+  --foreground: #FAF7F5;          /* Warm soft off-white text */
+  --card: #1E1E1E;                /* Deeper slate black card */
+  --card-foreground: #FAF7F5;
+  --popover: #1E1E1E;
+  --popover-foreground: #FAF7F5;
+  --primary: #D29082;             /* Glowing soft rose gold active indicator */
+  --primary-foreground: #121212;
+  --secondary: #2A2A2A;           /* Secondary deep warm charcoal */
+  --secondary-foreground: #D29082;
+  --muted: #1E1E1E;
+  --muted-foreground: #8A8A8A;
+  --accent: #2C1E1D;              /* Very dark glowing wisteria tint */
+  --accent-foreground: #FAF7F5;
+  --destructive: #E53935;
+  --destructive-foreground: #FFFFFF;
+  --border: #2A2A2A;
+  --input: #1E1E1E;
+  --ring: #D29082;
+  --sidebar: #121212;
+  --sidebar-foreground: #FAF7F5;
+  --sidebar-primary: #D29082;
+  --sidebar-primary-foreground: #121212;
+  --sidebar-accent: #2C1E1D;
+  --sidebar-accent-foreground: #FAF7F5;
+  --sidebar-border: #2A2A2A;
+  --sidebar-ring: #D29082;
+  
+  /* Brand tokens for dark mode */
+  --brand-teal: #D29082;
+  --brand-emerald: #D29082;
+  --brand-lavender: #121212;
+  --brand-frost: #2A2A2A;
+  --brand-deep: #FFFFFF;
+  --brand-mint: #128C7E;
+  --brand-blush: #1E1E1E;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    letter-spacing: -0.01em;
+    font-weight: 700;
+  }
+}
+
+@layer utilities {
+  .bg-soft-radial {
+    background-image:
+      radial-gradient(60rem 30rem at 10% -10%, color-mix(in srgb, var(--brand-teal) 15%, transparent), transparent 60%),
+      radial-gradient(50rem 25rem at 110% 10%, color-mix(in srgb, var(--brand-lavender) 10%, transparent), transparent 60%),
+      radial-gradient(40rem 25rem at 50% 110%, color-mix(in srgb, var(--brand-emerald) 12%, transparent), transparent 60%);
+  }
+
+  .bg-soft-band {
+    background-image: linear-gradient(135deg, #F0E7E3 0%, #FAF7F5 100%);
+  }
+
+  .glass {
+    background-color: color-mix(in srgb, white 72%, transparent);
+    backdrop-filter: saturate(150%) blur(16px);
+    -webkit-backdrop-filter: saturate(150%) blur(16px);
+    border: 1px solid color-mix(in srgb, white 65%, var(--color-border));
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.015), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, var(--brand-deep) 20%, var(--brand-teal) 70%, var(--brand-emerald));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .text-cursive {
+    font-family: "Cormorant Garamond", Georgia, serif !important;
+    font-weight: 600 !important;
+    font-style: italic !important;
+    letter-spacing: -0.01em !important;
+    background: linear-gradient(135deg, var(--primary) 20%, var(--accent-foreground) 80%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    display: inline-block;
+    padding-bottom: 0.05em;
+  }
+
+  .text-gradient-teal {
+    background: linear-gradient(135deg, var(--brand-teal), var(--brand-emerald));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .ring-soft {
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 10px 40px -12px color-mix(in srgb, var(--brand-teal) 25%, transparent);
+  }
+
+  .bg-dot-pattern {
+    background-image: radial-gradient(color-mix(in srgb, var(--brand-teal) 12%, transparent) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .bg-grid-pattern {
+    background-image:
+      linear-gradient(to right, color-mix(in srgb, var(--brand-teal) 6%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--brand-teal) 6%, transparent) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .border-glow-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .border-glow-hover:hover {
+    border-color: color-mix(in srgb, var(--brand-teal) 45%, transparent);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--brand-teal) 12%, transparent);
+  }
+
+  /* Wisteria Botanical clinic button overrides */
+  .bg-primary {
+    background: linear-gradient(135deg, #6C5350 0%, #7E6562 100%) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .bg-primary:hover {
+    background: #594240 !important;
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 10px 25px -5px rgba(108, 83, 80, 0.35) !important;
+  }
+
+  .bg-secondary {
+    background-color: #FFFFFF !important;
+    border: 1px solid #6C5350 !important;
+    color: #6C5350 !important;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .bg-secondary:hover {
+    background-color: #f7d8d2 !important;
+    color: #6C5350 !important;
+    border-color: #6C5350 !important;
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 10px 25px -5px rgba(108, 83, 80, 0.15) !important;
+  }
+
+  /* Editorial Card polish: bans boxy outlines for premium magazines aesthetic */
+  .rounded-xl.border, 
+  .rounded-2xl.border, 
+  .rounded-3xl.border,
+  [class*="Card"] {
+    border-color: rgba(234, 213, 210, 0.5) !important;
+    background-color: #FFFFFF !important;
+    box-shadow: 0 16px 48px -16px rgba(108, 83, 80, 0.06) !important;
+    transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  
+  .rounded-xl.border:hover, 
+  .rounded-2xl.border:hover, 
+  .rounded-3xl.border:hover,
+  [class*="Card"]:hover {
+    transform: translateY(-8px) !important;
+    border-color: rgba(210, 144, 130, 0.4) !important;
+    box-shadow: 0 24px 56px -12px rgba(108, 83, 80, 0.12) !important;
+  }
+
+  /* Premium Section Entrance slide-up animation */
+  section,
+  .grid > div {
+    animation: fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes float-slow {
+
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+      transform: translateY(-8px) rotate(1deg);
+    }
+  }
+
+  .animate-float-slow {
+    animation: float-slow 8s ease-in-out infinite;
+  }
+
+  @keyframes float-subtle {
+
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+
+  .animate-float-subtle {
+    animation: float-subtle 5s ease-in-out infinite;
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes pulse-bg {
+    0% {
+      opacity: 0.85;
+      filter: saturate(95%);
+    }
+    100% {
+      opacity: 1;
+      filter: saturate(115%);
+    }
+  }
+
+  .bg-soft-radial {
+    animation: pulse-bg 12s ease-in-out infinite alternate;
+  }
+}
