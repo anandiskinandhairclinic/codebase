@@ -10,39 +10,62 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestimonialsRouteImport } from './routes/testimonials'
-import { Route as ReceptionistRouteImport } from './routes/receptionist'
-import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as ServicesRouteImport } from './routes/services'
+import { Route as ProductsRouteImport } from './routes/products'
+import { Route as DoctorsRouteImport } from './routes/doctors'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as BlogRouteImport } from './routes/blog'
+import { Route as BeforeAfterRouteImport } from './routes/before-after'
 import { Route as AppointmentRouteImport } from './routes/appointment'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ServicesIndexRouteImport } from './routes/services.index'
-import { Route as ReceptionistIndexRouteImport } from './routes/receptionist.index'
-import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
-import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
-import { Route as AdminSectionRouteImport } from './routes/admin.$section'
+import { Route as ProductsIdRouteImport } from './routes/products.$id'
+import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminServicesRouteImport } from './routes/admin.services'
+import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as AdminGalleryRouteImport } from './routes/admin.gallery'
+import { Route as AdminDoctorsRouteImport } from './routes/admin.doctors'
+import { Route as AdminChatbotRouteImport } from './routes/admin.chatbot'
+import { Route as AdminBlogRouteImport } from './routes/admin.blog'
+import { Route as AdminBeforeAfterRouteImport } from './routes/admin.before-after'
+import { Route as AdminAppointmentsRouteImport } from './routes/admin.appointments'
 
 const TestimonialsRoute = TestimonialsRouteImport.update({
   id: '/testimonials',
   path: '/testimonials',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReceptionistRoute = ReceptionistRouteImport.update({
-  id: '/receptionist',
-  path: '/receptionist',
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GalleryRoute = GalleryRouteImport.update({
-  id: '/gallery',
-  path: '/gallery',
+const ProductsRoute = ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DoctorsRoute = DoctorsRouteImport.update({
+  id: '/doctors',
+  path: '/doctors',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BeforeAfterRoute = BeforeAfterRouteImport.update({
+  id: '/before-after',
+  path: '/before-after',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppointmentRoute = AppointmentRouteImport.update({
@@ -65,39 +88,64 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ServicesIndexRoute = ServicesIndexRouteImport.update({
-  id: '/services/',
-  path: '/services/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReceptionistIndexRoute = ReceptionistIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ReceptionistRoute,
-} as any)
-const BlogIndexRoute = BlogIndexRouteImport.update({
-  id: '/blog/',
-  path: '/blog/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const ServicesSlugRoute = ServicesSlugRouteImport.update({
-  id: '/services/$slug',
-  path: '/services/$slug',
-  getParentRoute: () => rootRouteImport,
+const ProductsIdRoute = ProductsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ProductsRoute,
 } as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/blog/$slug',
-  path: '/blog/$slug',
-  getParentRoute: () => rootRouteImport,
+const AdminTestimonialsRoute = AdminTestimonialsRouteImport.update({
+  id: '/testimonials',
+  path: '/testimonials',
+  getParentRoute: () => AdminRoute,
 } as any)
-const AdminSectionRoute = AdminSectionRouteImport.update({
-  id: '/$section',
-  path: '/$section',
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminServicesRoute = AdminServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGalleryRoute = AdminGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDoctorsRoute = AdminDoctorsRouteImport.update({
+  id: '/doctors',
+  path: '/doctors',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminChatbotRoute = AdminChatbotRouteImport.update({
+  id: '/chatbot',
+  path: '/chatbot',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBlogRoute = AdminBlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBeforeAfterRoute = AdminBeforeAfterRouteImport.update({
+  id: '/before-after',
+  path: '/before-after',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAppointmentsRoute = AdminAppointmentsRouteImport.update({
+  id: '/appointments',
+  path: '/appointments',
   getParentRoute: () => AdminRoute,
 } as any)
 
@@ -106,32 +154,49 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/appointment': typeof AppointmentRoute
+  '/before-after': typeof BeforeAfterRoute
+  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
-  '/gallery': typeof GalleryRoute
-  '/receptionist': typeof ReceptionistRouteWithChildren
+  '/doctors': typeof DoctorsRoute
+  '/products': typeof ProductsRouteWithChildren
+  '/services': typeof ServicesRoute
   '/testimonials': typeof TestimonialsRoute
-  '/admin/$section': typeof AdminSectionRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/services/$slug': typeof ServicesSlugRoute
+  '/admin/appointments': typeof AdminAppointmentsRoute
+  '/admin/before-after': typeof AdminBeforeAfterRoute
+  '/admin/blog': typeof AdminBlogRoute
+  '/admin/chatbot': typeof AdminChatbotRoute
+  '/admin/doctors': typeof AdminDoctorsRoute
+  '/admin/gallery': typeof AdminGalleryRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/services': typeof AdminServicesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
+  '/products/$id': typeof ProductsIdRoute
   '/admin/': typeof AdminIndexRoute
-  '/blog/': typeof BlogIndexRoute
-  '/receptionist/': typeof ReceptionistIndexRoute
-  '/services/': typeof ServicesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/appointment': typeof AppointmentRoute
+  '/before-after': typeof BeforeAfterRoute
+  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
-  '/gallery': typeof GalleryRoute
+  '/doctors': typeof DoctorsRoute
+  '/products': typeof ProductsRouteWithChildren
+  '/services': typeof ServicesRoute
   '/testimonials': typeof TestimonialsRoute
-  '/admin/$section': typeof AdminSectionRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/services/$slug': typeof ServicesSlugRoute
+  '/admin/appointments': typeof AdminAppointmentsRoute
+  '/admin/before-after': typeof AdminBeforeAfterRoute
+  '/admin/blog': typeof AdminBlogRoute
+  '/admin/chatbot': typeof AdminChatbotRoute
+  '/admin/doctors': typeof AdminDoctorsRoute
+  '/admin/gallery': typeof AdminGalleryRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/services': typeof AdminServicesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
+  '/products/$id': typeof ProductsIdRoute
   '/admin': typeof AdminIndexRoute
-  '/blog': typeof BlogIndexRoute
-  '/receptionist': typeof ReceptionistIndexRoute
-  '/services': typeof ServicesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -139,17 +204,25 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/appointment': typeof AppointmentRoute
+  '/before-after': typeof BeforeAfterRoute
+  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
-  '/gallery': typeof GalleryRoute
-  '/receptionist': typeof ReceptionistRouteWithChildren
+  '/doctors': typeof DoctorsRoute
+  '/products': typeof ProductsRouteWithChildren
+  '/services': typeof ServicesRoute
   '/testimonials': typeof TestimonialsRoute
-  '/admin/$section': typeof AdminSectionRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/services/$slug': typeof ServicesSlugRoute
+  '/admin/appointments': typeof AdminAppointmentsRoute
+  '/admin/before-after': typeof AdminBeforeAfterRoute
+  '/admin/blog': typeof AdminBlogRoute
+  '/admin/chatbot': typeof AdminChatbotRoute
+  '/admin/doctors': typeof AdminDoctorsRoute
+  '/admin/gallery': typeof AdminGalleryRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/services': typeof AdminServicesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
+  '/products/$id': typeof ProductsIdRoute
   '/admin/': typeof AdminIndexRoute
-  '/blog/': typeof BlogIndexRoute
-  '/receptionist/': typeof ReceptionistIndexRoute
-  '/services/': typeof ServicesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -158,49 +231,74 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/appointment'
+    | '/before-after'
+    | '/blog'
     | '/contact'
-    | '/gallery'
-    | '/receptionist'
+    | '/doctors'
+    | '/products'
+    | '/services'
     | '/testimonials'
-    | '/admin/$section'
-    | '/blog/$slug'
-    | '/services/$slug'
+    | '/admin/appointments'
+    | '/admin/before-after'
+    | '/admin/blog'
+    | '/admin/chatbot'
+    | '/admin/doctors'
+    | '/admin/gallery'
+    | '/admin/products'
+    | '/admin/services'
+    | '/admin/settings'
+    | '/admin/testimonials'
+    | '/products/$id'
     | '/admin/'
-    | '/blog/'
-    | '/receptionist/'
-    | '/services/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/appointment'
-    | '/contact'
-    | '/gallery'
-    | '/testimonials'
-    | '/admin/$section'
-    | '/blog/$slug'
-    | '/services/$slug'
-    | '/admin'
+    | '/before-after'
     | '/blog'
-    | '/receptionist'
+    | '/contact'
+    | '/doctors'
+    | '/products'
     | '/services'
+    | '/testimonials'
+    | '/admin/appointments'
+    | '/admin/before-after'
+    | '/admin/blog'
+    | '/admin/chatbot'
+    | '/admin/doctors'
+    | '/admin/gallery'
+    | '/admin/products'
+    | '/admin/services'
+    | '/admin/settings'
+    | '/admin/testimonials'
+    | '/products/$id'
+    | '/admin'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/admin'
     | '/appointment'
+    | '/before-after'
+    | '/blog'
     | '/contact'
-    | '/gallery'
-    | '/receptionist'
+    | '/doctors'
+    | '/products'
+    | '/services'
     | '/testimonials'
-    | '/admin/$section'
-    | '/blog/$slug'
-    | '/services/$slug'
+    | '/admin/appointments'
+    | '/admin/before-after'
+    | '/admin/blog'
+    | '/admin/chatbot'
+    | '/admin/doctors'
+    | '/admin/gallery'
+    | '/admin/products'
+    | '/admin/services'
+    | '/admin/settings'
+    | '/admin/testimonials'
+    | '/products/$id'
     | '/admin/'
-    | '/blog/'
-    | '/receptionist/'
-    | '/services/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -208,14 +306,13 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AppointmentRoute: typeof AppointmentRoute
+  BeforeAfterRoute: typeof BeforeAfterRoute
+  BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
-  GalleryRoute: typeof GalleryRoute
-  ReceptionistRoute: typeof ReceptionistRouteWithChildren
+  DoctorsRoute: typeof DoctorsRoute
+  ProductsRoute: typeof ProductsRouteWithChildren
+  ServicesRoute: typeof ServicesRoute
   TestimonialsRoute: typeof TestimonialsRoute
-  BlogSlugRoute: typeof BlogSlugRoute
-  ServicesSlugRoute: typeof ServicesSlugRoute
-  BlogIndexRoute: typeof BlogIndexRoute
-  ServicesIndexRoute: typeof ServicesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -227,18 +324,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TestimonialsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/receptionist': {
-      id: '/receptionist'
-      path: '/receptionist'
-      fullPath: '/receptionist'
-      preLoaderRoute: typeof ReceptionistRouteImport
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/gallery': {
-      id: '/gallery'
-      path: '/gallery'
-      fullPath: '/gallery'
-      preLoaderRoute: typeof GalleryRouteImport
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/doctors': {
+      id: '/doctors'
+      path: '/doctors'
+      fullPath: '/doctors'
+      preLoaderRoute: typeof DoctorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -246,6 +350,20 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/before-after': {
+      id: '/before-after'
+      path: '/before-after'
+      fullPath: '/before-after'
+      preLoaderRoute: typeof BeforeAfterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/appointment': {
@@ -276,27 +394,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/services/': {
-      id: '/services/'
-      path: '/services'
-      fullPath: '/services/'
-      preLoaderRoute: typeof ServicesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/receptionist/': {
-      id: '/receptionist/'
-      path: '/'
-      fullPath: '/receptionist/'
-      preLoaderRoute: typeof ReceptionistIndexRouteImport
-      parentRoute: typeof ReceptionistRoute
-    }
-    '/blog/': {
-      id: '/blog/'
-      path: '/blog'
-      fullPath: '/blog/'
-      preLoaderRoute: typeof BlogIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -304,52 +401,126 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/services/$slug': {
-      id: '/services/$slug'
-      path: '/services/$slug'
-      fullPath: '/services/$slug'
-      preLoaderRoute: typeof ServicesSlugRouteImport
-      parentRoute: typeof rootRouteImport
+    '/products/$id': {
+      id: '/products/$id'
+      path: '/$id'
+      fullPath: '/products/$id'
+      preLoaderRoute: typeof ProductsIdRouteImport
+      parentRoute: typeof ProductsRoute
     }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/blog/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
-      parentRoute: typeof rootRouteImport
+    '/admin/testimonials': {
+      id: '/admin/testimonials'
+      path: '/testimonials'
+      fullPath: '/admin/testimonials'
+      preLoaderRoute: typeof AdminTestimonialsRouteImport
+      parentRoute: typeof AdminRoute
     }
-    '/admin/$section': {
-      id: '/admin/$section'
-      path: '/$section'
-      fullPath: '/admin/$section'
-      preLoaderRoute: typeof AdminSectionRouteImport
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/services': {
+      id: '/admin/services'
+      path: '/services'
+      fullPath: '/admin/services'
+      preLoaderRoute: typeof AdminServicesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/gallery': {
+      id: '/admin/gallery'
+      path: '/gallery'
+      fullPath: '/admin/gallery'
+      preLoaderRoute: typeof AdminGalleryRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/doctors': {
+      id: '/admin/doctors'
+      path: '/doctors'
+      fullPath: '/admin/doctors'
+      preLoaderRoute: typeof AdminDoctorsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/chatbot': {
+      id: '/admin/chatbot'
+      path: '/chatbot'
+      fullPath: '/admin/chatbot'
+      preLoaderRoute: typeof AdminChatbotRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/blog': {
+      id: '/admin/blog'
+      path: '/blog'
+      fullPath: '/admin/blog'
+      preLoaderRoute: typeof AdminBlogRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/before-after': {
+      id: '/admin/before-after'
+      path: '/before-after'
+      fullPath: '/admin/before-after'
+      preLoaderRoute: typeof AdminBeforeAfterRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/appointments': {
+      id: '/admin/appointments'
+      path: '/appointments'
+      fullPath: '/admin/appointments'
+      preLoaderRoute: typeof AdminAppointmentsRouteImport
       parentRoute: typeof AdminRoute
     }
   }
 }
 
 interface AdminRouteChildren {
-  AdminSectionRoute: typeof AdminSectionRoute
+  AdminAppointmentsRoute: typeof AdminAppointmentsRoute
+  AdminBeforeAfterRoute: typeof AdminBeforeAfterRoute
+  AdminBlogRoute: typeof AdminBlogRoute
+  AdminChatbotRoute: typeof AdminChatbotRoute
+  AdminDoctorsRoute: typeof AdminDoctorsRoute
+  AdminGalleryRoute: typeof AdminGalleryRoute
+  AdminProductsRoute: typeof AdminProductsRoute
+  AdminServicesRoute: typeof AdminServicesRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminTestimonialsRoute: typeof AdminTestimonialsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminSectionRoute: AdminSectionRoute,
+  AdminAppointmentsRoute: AdminAppointmentsRoute,
+  AdminBeforeAfterRoute: AdminBeforeAfterRoute,
+  AdminBlogRoute: AdminBlogRoute,
+  AdminChatbotRoute: AdminChatbotRoute,
+  AdminDoctorsRoute: AdminDoctorsRoute,
+  AdminGalleryRoute: AdminGalleryRoute,
+  AdminProductsRoute: AdminProductsRoute,
+  AdminServicesRoute: AdminServicesRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminTestimonialsRoute: AdminTestimonialsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface ReceptionistRouteChildren {
-  ReceptionistIndexRoute: typeof ReceptionistIndexRoute
+interface ProductsRouteChildren {
+  ProductsIdRoute: typeof ProductsIdRoute
 }
 
-const ReceptionistRouteChildren: ReceptionistRouteChildren = {
-  ReceptionistIndexRoute: ReceptionistIndexRoute,
+const ProductsRouteChildren: ProductsRouteChildren = {
+  ProductsIdRoute: ProductsIdRoute,
 }
 
-const ReceptionistRouteWithChildren = ReceptionistRoute._addFileChildren(
-  ReceptionistRouteChildren,
+const ProductsRouteWithChildren = ProductsRoute._addFileChildren(
+  ProductsRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
@@ -357,14 +528,13 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AppointmentRoute: AppointmentRoute,
+  BeforeAfterRoute: BeforeAfterRoute,
+  BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
-  GalleryRoute: GalleryRoute,
-  ReceptionistRoute: ReceptionistRouteWithChildren,
+  DoctorsRoute: DoctorsRoute,
+  ProductsRoute: ProductsRouteWithChildren,
+  ServicesRoute: ServicesRoute,
   TestimonialsRoute: TestimonialsRoute,
-  BlogSlugRoute: BlogSlugRoute,
-  ServicesSlugRoute: ServicesSlugRoute,
-  BlogIndexRoute: BlogIndexRoute,
-  ServicesIndexRoute: ServicesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
