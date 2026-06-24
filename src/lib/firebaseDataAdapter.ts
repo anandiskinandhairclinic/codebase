@@ -13,6 +13,7 @@ import {
   getHeroData,
   getDoctorInfo,
   getServices,
+  getServiceBySlug,
   getTestimonials,
   getBlogs,
   getGallery,
@@ -21,11 +22,19 @@ import {
   getSpecialtiesData,
   getWhyChooseUsData,
   getBeforeAfterVideo,
+  getProducts,
+  getBeforeAfterItems,
+  createOrder,
+  addDocToCollection,
+  updateDocInCollection,
+  deleteDocFromCollection,
+  updateSingleDoc,
+  getChatbotRules,
 } from "./firebaseServices";
 import { clinic, whatsappLink, telLink } from "./clinic";
 
 // Re-export unchanged backend functions
-export { createAppointment, whatsappLink, telLink };
+export { createAppointment, whatsappLink, telLink, createOrder, addDocToCollection, updateDocInCollection, deleteDocFromCollection, updateSingleDoc, getServiceBySlug, getChatbotRules };
 
 // ────────────────────────────────────────────
 // Types that the new frontend expects
@@ -38,9 +47,17 @@ export type Treatment = {
   duration: string;
   price: number;
   blurb: string;
+  image?: string;
+  overview?: string;
+  symptoms?: string[];
+  causes?: string[];
+  process?: { step: string; detail: string }[];
+  benefits?: string[];
+  faqs?: { q: string; a: string }[];
 };
 
 export type Testimonial = {
+  id?: string;
   name: string;
   treatment: string;
   rating: number;
@@ -55,6 +72,7 @@ export type BlogPost = {
   excerpt: string;
   read: string;
   imageUrl?: string;
+  content?: string;
 };
 
 export type Doctor = {
@@ -79,6 +97,7 @@ export type Product = {
   benefits: string[];
   ingredients: string[];
   blurb: string;
+  imageUrl?: string;
 };
 
 export type BeforeAfterItem = {
@@ -86,11 +105,20 @@ export type BeforeAfterItem = {
   treatment: string;
   weeks: number;
   story: string;
+  beforeSrc: string;
+  afterSrc: string;
 };
 
 export type FAQ = { q: string; a: string };
 
 export type Stat = { value: string; label: string };
+
+export type ChatbotRule = {
+  id?: string;
+  track: "skin" | "hair";
+  if: string[];
+  then: string[];
+};
 
 // ────────────────────────────────────────────
 // Clinic info
@@ -119,6 +147,13 @@ export async function getTreatments(): Promise<Treatment[]> {
     duration: guessDuration(s),
     price: s.price || 0,
     blurb: s.short || s.overview?.slice(0, 120) + "…" || "",
+    image: s.image || s.imageUrl || "",
+    overview: s.overview || "",
+    symptoms: s.symptoms || [],
+    causes: s.causes || [],
+    process: s.process || [],
+    benefits: s.benefits || [],
+    faqs: s.faqs || [],
   }));
 }
 
@@ -149,6 +184,7 @@ function guessDuration(s: any): string {
 export async function getTestimonialsList(): Promise<Testimonial[]> {
   const rawTestimonials = await getTestimonials();
   return rawTestimonials.map((t: any) => ({
+    id: t.id,
     name: t.name || "Patient",
     treatment: t.treatment || t.service || "General",
     rating: t.rating || 5,
@@ -170,7 +206,13 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     excerpt: b.excerpt || b.summary || b.content?.slice(0, 140) + "…" || "",
     read: b.readTime || b.read || "5 min",
     imageUrl: b.imageUrl || b.image || undefined,
+    content: b.content || b.excerpt || "",
   }));
+}
+
+export async function getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+  const list = await getBlogPosts();
+  return list.find((p) => p.slug === slug);
 }
 
 // ────────────────────────────────────────────
@@ -181,13 +223,13 @@ export async function getDoctorsList(): Promise<Doctor[]> {
   const doc = await getDoctorInfo();
   return [
     {
-      slug: "dr-amit-jain",
-      name: doc.name || "Dr. Amit Jain",
-      title: doc.role || "Chief Dermatologist & Hair Transplant Specialist",
-      image: doc.imageUrl || "https://res.cloudinary.com/dntsjzbei/image/upload/v1780681530/yotg2haunjnbiblavmpb.png",
+      slug: "dr-vishakha-patil",
+      name: doc.name || "Dr. Vishakha Padmakar Patil",
+      title: doc.role || "Chief Dermatologist & Hair Care Specialist",
+      image: doc.imageUrl || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80",
       experience: "10+ years",
-      qualifications: doc.qualifications || ["MBBS", "MD - Skin (Dermatology, Venereology & Leprosy)"],
-      specialties: ["Dermatology", "Cosmetology", "Hair Transplant", "Laser Treatments"],
+      qualifications: doc.qualifications || ["MBBS", "MD - Skin (Dermatology, Venereology & Leprosy), Board-Certified Dermatologist"],
+      specialties: ["Dermatology", "Cosmetology", "Hair Care", "Laser Treatments"],
       awards: (doc.publications || []).map((p: any) => `${p.title} — ${p.journal} (${p.year})`),
       bio: doc.bio || "",
     },
@@ -241,39 +283,71 @@ export async function getGalleryImages() {
 export { getSpecialtiesData, getWhyChooseUsData, getHeroData, getBeforeAfterVideo };
 
 // ────────────────────────────────────────────
-// Products (no Firestore collection yet — inline defaults)
+// Products (Wired to Firestore)
 // ────────────────────────────────────────────
 
-import products from "@/assets/products.jpg";
+import productsImg from "@/assets/products.jpg";
+import { productList as fallbackProducts } from "./data";
 
-export const productImage = products;
+export const productImage = productsImg;
 
-export const productList: Product[] = [
-  { id: "p1", name: "Glow Renew Serum", category: "Serums", price: 2400, skin: "All", hair: null, benefits: ["Brightens", "Even tone", "Hydrates"], ingredients: ["Niacinamide 10%", "Vitamin C", "Hyaluronic Acid"], blurb: "Lit-from-within radiance in 4 weeks." },
-  { id: "p2", name: "Gentle Calm Cleanser", category: "Face Wash", price: 950, skin: "Sensitive", hair: null, benefits: ["Calms", "Non-stripping"], ingredients: ["Centella Asiatica", "Panthenol"], blurb: "A morning ritual for reactive skin." },
-  { id: "p3", name: "Velvet Veil SPF 50", category: "Sunscreens", price: 1450, skin: "All", hair: null, benefits: ["Broad spectrum", "No white cast"], ingredients: ["Zinc Oxide", "Niacinamide"], blurb: "Silken finish, daily protection." },
-  { id: "p4", name: "Ceramide Cloud Cream", category: "Moisturizers", price: 1800, skin: "Dry", hair: null, benefits: ["Repairs barrier", "Plumps"], ingredients: ["Ceramide NP", "Squalane"], blurb: "Pillowy hydration that lasts 24h." },
-  { id: "p5", name: "Clear Skin Spot Serum", category: "Acne Care", price: 1200, skin: "Oily", hair: null, benefits: ["Targets breakouts"], ingredients: ["Salicylic 2%", "Tea Tree"], blurb: "Calms a flare without drying out." },
-  { id: "p6", name: "Root Revive Serum", category: "Hair Growth", price: 2200, skin: null, hair: "Thinning", benefits: ["Boosts density"], ingredients: ["Redensyl", "Caffeine", "Biotin"], blurb: "A nightly massage for visible thickness." },
-  { id: "p7", name: "Silken Hair Mask", category: "Hair Care", price: 1650, skin: null, hair: "Dry", benefits: ["Softens", "Reduces frizz"], ingredients: ["Argan Oil", "Keratin"], blurb: "Restores salon-soft strands." },
-  { id: "p8", name: "Timeless Retinol", category: "Anti Aging", price: 2900, skin: "All", hair: null, benefits: ["Smooths lines"], ingredients: ["Encapsulated Retinol 0.3%"], blurb: "Your nightly age-rewind ritual." },
-  { id: "p9", name: "Clarifying Scalp Tonic", category: "Hair Care", price: 1400, skin: null, hair: "Oily", benefits: ["Balances scalp"], ingredients: ["Salicylic", "Rosemary"], blurb: "Fresh, weightless roots all day." },
-  { id: "p10", name: "Bright Eye Elixir", category: "Serums", price: 1950, skin: "All", hair: null, benefits: ["De-puffs", "Brightens"], ingredients: ["Caffeine", "Peptides"], blurb: "Wake up — even when you didn't." },
-  { id: "p11", name: "Soft Foam Oil Wash", category: "Face Wash", price: 990, skin: "Oily", hair: null, benefits: ["Removes excess oil"], ingredients: ["Salicylic", "Green Tea"], blurb: "A clean reset, never tight." },
-  { id: "p12", name: "Hydra Mist", category: "Moisturizers", price: 1100, skin: "All", hair: null, benefits: ["Refreshes"], ingredients: ["Rose water", "HA"], blurb: "A spritz of dew on demand." },
-];
+export async function getProductsList(): Promise<Product[]> {
+  const list = await getProducts();
+  if (list.length > 0) return list;
+  return fallbackProducts;
+}
+
+export async function getProductById(id: string): Promise<Product | undefined> {
+  const list = await getProductsList();
+  return list.find((p) => p.id === id);
+}
 
 export const productCategories = ["All", "Face Wash", "Serums", "Sunscreens", "Moisturizers", "Acne Care", "Hair Growth", "Hair Care", "Anti Aging"];
 export const skinTypes = ["All", "Oily", "Dry", "Sensitive", "Combination"];
 export const hairTypes = ["All", "Thinning", "Oily", "Dry", "Damaged"];
 
 // ────────────────────────────────────────────
-// Before/After (no Firestore collection yet — inline defaults)
+// Before/After (Wired to Firestore gallery collection)
 // ────────────────────────────────────────────
 
-export const beforeAfter: BeforeAfterItem[] = [
-  { id: "ba1", treatment: "Acne Treatment", weeks: 12, story: "Cystic acne calmed by Week 8 with our medical + cosmeceutical protocol." },
-  { id: "ba2", treatment: "Pigmentation Reset", weeks: 16, story: "Stubborn melasma fading visibly across six laser sessions." },
-  { id: "ba3", treatment: "PRP Hair Therapy", weeks: 20, story: "Thicker hairline & visible regrowth in 5 months." },
-  { id: "ba4", treatment: "Hydrafacial Glow", weeks: 4, story: "Brighter, tighter, more even-toned skin in just four sessions." },
-];
+export async function getBeforeAfterList(): Promise<BeforeAfterItem[]> {
+  const list = await getBeforeAfterItems();
+  if (list.length > 0) {
+    return list.map((item: any) => ({
+      id: item.id || "",
+      treatment: item.caption || item.treatment || "Treatment",
+      weeks: item.weeks || 12,
+      story: item.story || "",
+      beforeSrc: item.beforeSrc || item.before || "",
+      afterSrc: item.afterSrc || item.after || "",
+    }));
+  }
+  // Fallbacks
+  return [
+    {
+      id: "ba1",
+      treatment: "Acne Control Therapy",
+      weeks: 12,
+      story: "Acne control therapy combined with medical peels.",
+      beforeSrc: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=900&q=70",
+      afterSrc: "https://images.unsplash.com/photo-1556228852-80b6e5eeff06?w=900&q=70"
+    },
+    {
+      id: "ba2",
+      treatment: "Pigmentation & Tone Laser",
+      weeks: 16,
+      story: "Stubborn hyperpigmentation fading with laser sessions.",
+      beforeSrc: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=900&q=70",
+      afterSrc: "https://images.unsplash.com/photo-1614109800763-7b46d0a9ad44?w=900&q=70"
+    },
+    {
+      id: "ba3",
+      treatment: "PRP Hair Density Therapy",
+      weeks: 20,
+      story: "PRP sessions over 5 months showing hair restoration.",
+      beforeSrc: "https://images.unsplash.com/photo-1559599101-f09722fb4948?w=900&q=70",
+      afterSrc: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=900&q=70"
+    }
+  ];
+}
+

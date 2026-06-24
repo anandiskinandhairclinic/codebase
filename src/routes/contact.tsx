@@ -3,7 +3,7 @@ import { Mail, MapPin, Phone, Clock } from "lucide-react";
 import { clinic, whatsappLink, telLink } from "@/lib/clinic";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({ meta: [{ title: "Contact — Dr. Jain's Skin Care Clinic" }] }),
+  head: () => ({ meta: [{ title: "Contact — Anandi Skin & Hair Clinic" }] }),
   component: Page,
 });
 
@@ -13,7 +13,7 @@ function Page() {
     const form = e.currentTarget;
     const formData = new FormData(form);
     try {
-      await fetch("https://formsubmit.co/ajax/dramitjainskinclinic@gmail.com", {
+      await fetch("https://formsubmit.co/ajax/info@anandiclinic.in", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({

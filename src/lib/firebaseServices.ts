@@ -1,5 +1,5 @@
 import { db } from "./firebase";
-import { collection, getDocs, getDoc, doc, addDoc, updateDoc } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, addDoc, updateDoc, deleteDoc, setDoc } from "firebase/firestore";
 import { clinic as fallbackClinic } from "./clinic";
 import {
   services as fallbackServices,
@@ -67,25 +67,25 @@ export async function getHeroData() {
   }, defaultHero);
 }
 
-// 3. Get Doctor Bio
+// 3. Get Doctor Info
 export async function getDoctorInfo() {
   const defaultDoctor = {
-    name: "Dr. Amit Jain",
-    role: "Chief Dermatologist & Hair Transplant Specialist",
-    qualifications: ["MBBS from prestigious university", "MD - Skin (Dermatology, Venereology & Leprosy)"],
+    name: "Dr. Vishakha Padmakar Patil",
+    role: "Chief Dermatologist & Hair Specialist",
+    qualifications: ["MBBS", "MD - Skin (Dermatology, Venereology & Leprosy), Board-Certified Dermatologist"],
     memberships: [
       "Indian Association of Dermatologists, Venereologists and Leprologists (IADVL)",
       "Cosmetology Society of India (CSI)",
       "Association of Hair Restoration Surgeons (AHRS)",
     ],
-    imageUrl: "https://res.cloudinary.com/dntsjzbei/image/upload/v1780681530/yotg2haunjnbiblavmpb.png",
-    bio: "Dr. Amit Jain is a highly experienced skin specialist based in Katraj, Pune. Over the last 10+ years, he has successfully delivered clinical and aesthetic solutions for thousands of patients with a patient-first ethos.",
+    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80",
+    bio: "Dr. Vishakha Padmakar Patil is a board-certified dermatologist and hair care specialist based in Katraj/Ambegaon, Pune. With extensive clinical experience, she provides ethical, evidence-based solutions for acne, hair loss, pigmentation, and cosmetology concerns.",
     publications: [
       {
         title: "Annular Elastolytic Giant Cell Granuloma: A Rare Mimicker of Common Annular Dermatoses",
         journal: "BMJ Case Reports",
         journalShort: "BMJ",
-        authors: "Amit Jain, Sahana Ojha, Suyog Dhamale, Vidyadhar R. Sardesai",
+        authors: "Vishakha Patil, Sahana Ojha, Suyog Dhamale, Vidyadhar R. Sardesai",
         year: "2025",
         volume: "Vol. 18, Issue 12, e268061",
         doi: "10.1136/bcr-2025-268061",
@@ -98,7 +98,7 @@ export async function getDoctorInfo() {
         title: "Symmetrical Drug-Related Intertriginous and Flexural Exanthema (SDRIFE) Unfolded: Diagnostic Pitfalls and Psoriatic Confounders Among Flexural Dermatoses",
         journal: "Cureus",
         journalShort: "Cureus",
-        authors: "Gautam K. Singh, Suyog S. Dhamale, Amit Jain, Anshu Baghel, Vidyadhar R. Sardesai",
+        authors: "Gautam K. Singh, Suyog S. Dhamale, Vishakha Patil, Anshu Baghel, Vidyadhar R. Sardesai",
         year: "2025",
         volume: "Vol. 17, Issue 9, e93524",
         doi: "10.7759/cureus.93524",
@@ -111,7 +111,7 @@ export async function getDoctorInfo() {
         title: "Factors Responsible for Difficult to Treat Superficial Fungal Infections: A Study from a Tertiary Healthcare Centre in India",
         journal: "Mycoses (Wiley)",
         journalShort: "Mycoses",
-        authors: "Amit Jain, Suyog Dhamale, Vidyadhar Sardesai",
+        authors: "Vishakha Patil, Suyog Dhamale, Vidyadhar Sardesai",
         year: "2021",
         volume: "Vol. 64, Issue 11, pp. 1442–1447",
         doi: "10.1111/myc.13301",
@@ -145,14 +145,25 @@ export async function getServices() {
   }, fallbackServices);
 }
 
+export async function getServiceBySlug(slug: string) {
+  return safeQuery(async () => {
+    const docRef = doc(db, "services", slug);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data();
+    }
+    return fallbackServices.find((s) => s.slug === slug) || null;
+  }, null);
+}
+
 // 5. Get Testimonials
 export async function getTestimonials() {
   return safeQuery(async () => {
     const querySnap = await getDocs(collection(db, "testimonials"));
     if (!querySnap.empty) {
       const items: any[] = [];
-      querySnap.forEach((d) => items.push(d.data()));
-      return items as typeof fallbackTestimonials;
+      querySnap.forEach((d) => items.push({ id: d.id, ...d.data() }));
+      return items;
     }
     return fallbackTestimonials;
   }, fallbackTestimonials);
@@ -214,7 +225,7 @@ export async function createAppointment(data: {
 
     // Send email notification to doctor
     try {
-      await fetch("https://formsubmit.co/ajax/dramitjainskinclinic@gmail.com", {
+      await fetch("https://formsubmit.co/ajax/info@anandiclinic.in", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -271,18 +282,18 @@ export async function getWhyChooseUsData() {
   const defaultWhyChooseUs = {
     eyebrow: "Clinical Integrity",
     titleMain: "Why Choose",
-    titleCursive: "Dr. Amit Jain",
+    titleCursive: "Dr. Vishakha Patil",
     leftCardBadge: "MD - Dermatology (Skin)",
     leftCardTitleMain: "Dermatology built on clinical",
     leftCardTitleCursive: "Integrity",
-    leftCardDesc: "Dr. Amit Jain believes that skincare is a medical science, not a commercial transaction. We completely reject the aggressive sales targets common in aesthetic clinics, prioritizing your skin's health above all else.",
+    leftCardDesc: "Dr. Vishakha Padmakar Patil believes that skincare is a medical science, not a commercial transaction. We completely reject the aggressive sales targets common in aesthetic clinics, prioritizing your skin's health above all else.",
     leftCardBullets: [
       "10+ Years Active Clinical Experience",
       "15,000+ Successfully Treated Patients",
       "100% Evidence-Based Medical Protocols"
     ],
     items: [
-      { t: "Expert-Led Care Only", d: "Unlike general aesthetic clinics, every consultation, diagnosis, and clinical procedure is directly handled by Dr. Amit Jain himself.", icon: "Award" },
+      { t: "Expert-Led Care Only", d: "Unlike general aesthetic clinics, every consultation, diagnosis, and clinical procedure is directly handled by Dr. Vishakha Patil herself.", icon: "Award" },
       { t: "FDA-Cleared Technology", d: "Equipped with gold-standard, FDA-cleared aesthetic lasers and double-spin clinical PRP centrifuges for maximum efficacy.", icon: "ShieldCheck" },
       { t: "Indian Skin Specialization", d: "Calibrated protocols specially designed for Type IV-VI Indian skin, focusing strictly on melanocyte safety to prevent post-treatment pigmentation.", icon: "Heart" },
       { t: "Transparent & Ethical Pricing", d: "Upfront pricing schedules with absolutely zero forced cosmetic packages, hidden add-ons, or sales targets.", icon: "CheckCircle2" }
@@ -313,4 +324,96 @@ export async function getBeforeAfterVideo() {
     return defaultVideo;
   }, defaultVideo);
 }
+
+// 13. Get Products
+export async function getProducts() {
+  return safeQuery(async () => {
+    const querySnap = await getDocs(collection(db, "products"));
+    if (!querySnap.empty) {
+      const items: any[] = [];
+      querySnap.forEach((d) => items.push({ id: d.id, ...d.data() }));
+      return items;
+    }
+    return [];
+  }, []);
+}
+
+// 14. Get Before/After Items
+export async function getBeforeAfterItems() {
+  return safeQuery(async () => {
+    const querySnap = await getDocs(collection(db, "gallery"));
+    if (!querySnap.empty) {
+      const items: any[] = [];
+      querySnap.forEach((d) => {
+        const data = d.data();
+        if (data.category === "Before & After" || (data.beforeSrc && data.afterSrc)) {
+          items.push({ id: d.id, ...data });
+        }
+      });
+      return items;
+    }
+    return [];
+  }, []);
+}
+
+// 15. Create Customer Order
+export async function createOrder(data: {
+  customerName: string;
+  phone: string;
+  deliveryOption: "pickup" | "deliver";
+  address?: string;
+  items: Array<{ id: string; name: string; price: number; quantity: number }>;
+  total: number;
+}) {
+  try {
+    const docRef = await addDoc(collection(db, "orders"), {
+      ...data,
+      status: "Pending",
+      createdAt: new Date().toISOString(),
+    });
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    console.error("[Firebase Service] Error creating order: ", error);
+    return { success: false, error: String(error) };
+  }
+}
+
+// 16. Generic CRUD Write Helpers
+export async function addDocToCollection(colName: string, data: any) {
+  const docRef = await addDoc(collection(db, colName), {
+    ...data,
+    createdAt: new Date().toISOString(),
+  });
+  return docRef.id;
+}
+
+export async function updateDocInCollection(colName: string, id: string, data: any) {
+  const docRef = doc(db, colName, id);
+  await updateDoc(docRef, data);
+}
+
+export async function deleteDocFromCollection(colName: string, id: string) {
+  const docRef = doc(db, colName, id);
+  await deleteDoc(docRef);
+}
+
+export async function updateSingleDoc(colName: string, docId: string, data: any) {
+  const docRef = doc(db, colName, docId);
+  await setDoc(docRef, data, { merge: true });
+}
+
+// 17. Get Chatbot Rules
+export async function getChatbotRules() {
+  return safeQuery(async () => {
+    const querySnap = await getDocs(collection(db, "chatbotRules"));
+    if (!querySnap.empty) {
+      const items: any[] = [];
+      querySnap.forEach((d) => items.push({ id: d.id, ...d.data() }));
+      return items;
+    }
+    return [];
+  }, []);
+}
+
+
 

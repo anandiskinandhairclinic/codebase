@@ -204,7 +204,7 @@ export const services: Service[] = [
     short: "Confidential diagnosis and effective treatment for intimate health concerns.",
     icon: "ShieldAlert",
     overview:
-      "We offer highly confidential, professional consultations for sexually transmitted infections (STIs/STDs) affecting the skin and mucosa. Dr. Amit Jain provides expert diagnostic guidance and evidence-based drug therapy.",
+      "We offer highly confidential, professional consultations for sexually transmitted infections (STIs/STDs) affecting the skin and mucosa. Dr. Vishakha Padmakar Patil provides expert diagnostic guidance and evidence-based drug therapy.",
     symptoms: [
       "Genital warts, bumps, or blisters",
       "Unexplained rashes or sores on the body, hands, or feet",
@@ -467,7 +467,7 @@ export const services: Service[] = [
     short: "Dermatologist-led early detection, multi-drug therapy, and care for Hansen's disease.",
     icon: "Activity",
     overview:
-      "Leprosy is a curable bacterial infection affecting the skin and nerves. Dr. Amit Jain provides confidential clinical assessments, early detection to prevent nerve damage, and supervises Multi-Drug Therapy (MDT) protocols.",
+      "Leprosy is a curable bacterial infection affecting the skin and nerves. Dr. Vishakha Padmakar Patil provides confidential clinical assessments, early detection to prevent nerve damage, and supervises Multi-Drug Therapy (MDT) protocols.",
     symptoms: [
       "Pale or reddish patches of skin with loss of sensation (numbness)",
       "Weakness or numbness in hands, feet, or face",
@@ -732,7 +732,7 @@ export const services: Service[] = [
     ],
     faqs: [
       { q: "How long does Botox last?", a: "Results typically last between 3 to 6 months; regular touch-ups maintain the look." },
-      { q: "Does it look natural?", a: "Yes, when performed by a qualified dermatologist like Dr. Amit Jain, you will maintain natural expressions." },
+      { q: "Does it look natural?", a: "Yes, when performed by a qualified dermatologist like Dr. Vishakha Padmakar Patil, you will maintain natural expressions." },
     ],
   },
   {
@@ -994,12 +994,28 @@ export type Testimonial = {
 
 export const testimonials: Testimonial[] = [
   {
-    name: "Rohan S.",
-    initials: "RS",
+    name: "Sakshi Patil",
+    initials: "SP",
+    rating: 5,
+    date: "1 week ago",
+    text: "I highly recommend Anandi Clinic to anyone dealing with acne or skin issues.",
+    concern: "Acne Care",
+  },
+  {
+    name: "Yashwant More",
+    initials: "YM",
     rating: 5,
     date: "3 weeks ago",
-    text: "Great clinic. Dedicated staff and doctor has excellent communication and soft skills.",
-    concern: "Acne",
+    text: "Great skin and hair clinic. Thank you so much for your service.",
+    concern: "Hair Treatment",
+  },
+  {
+    name: "Dr. Suleman Mulla",
+    initials: "SM",
+    rating: 5,
+    date: "1 month ago",
+    text: "Best and well experienced Dermatologist in Area.. must visit 😊👍🏻",
+    concern: "Consultation",
   },
   {
     name: "Priya M.",
@@ -1008,22 +1024,6 @@ export const testimonials: Testimonial[] = [
     date: "1 month ago",
     text: "Very accurate diagnosis, clear explanation and effective treatment. Highly satisfied.",
     concern: "Pigmentation",
-  },
-  {
-    name: "Aditya K.",
-    initials: "AK",
-    rating: 5,
-    date: "2 months ago",
-    text: "Highly recommended place for skin problems. Saw real improvement within weeks.",
-    concern: "Hair Fall",
-  },
-  {
-    name: "Sneha P.",
-    initials: "SP",
-    rating: 5,
-    date: "2 months ago",
-    text: "Dr. Jain is patient, thorough and never pushes unnecessary procedures. Felt safe and informed.",
-    concern: "Melasma",
   },
   {
     name: "Vikram J.",
@@ -1045,9 +1045,7 @@ export const testimonials: Testimonial[] = [
 
 export const galleryImages = [
   // Doctor Images
-  { src: "https://res.cloudinary.com/dntsjzbei/image/upload/v1780681530/yotg2haunjnbiblavmpb.png", category: "Doctor", caption: "Dr. Amit Jain — Consultation" },
-  // { src: "https://res.cloudinary.com/dntsjzbei/image/upload/v1780681530/yotg2haunjnbiblavmpb.png", category: "Doctor", caption: "Dr. Amit Jain — In Clinic" },
-  // { src: "https://res.cloudinary.com/dntsjzbei/image/upload/v1780681530/yotg2haunjnbiblavmpb.png", category: "Doctor", caption: "Dr. Amit Jain — Dermatology Expert" },
+  { src: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80", category: "Doctor", caption: "Dr. Vishakha Padmakar Patil — Chief Dermatologist" },
   // Clinic Images
   { src: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1000&q=70", category: "Clinic", caption: "Reception Area" },
   { src: "https://images.unsplash.com/photo-1631815587646-b85a1bb027e1?w=1000&q=70", category: "Clinic", caption: "Consultation Room" },
@@ -1090,6 +1088,34 @@ export const faqs = [
 export const stats = [
   { value: "10+", label: "Years of Experience" },
   { value: "15,000+", label: "Happy Patients" },
-  { value: "4.8★", label: "Google Rating" },
+  { value: "5.0★", label: "Google Rating" },
   { value: "20+", label: "Treatments Offered" },
+];
+
+export type Product = {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  skin: string | null;
+  hair: string | null;
+  benefits: string[];
+  ingredients: string[];
+  blurb: string;
+  imageUrl?: string;
+};
+
+export const productList: Product[] = [
+  { id: "p1", name: "Glow Renew Serum", category: "Serums", price: 2400, skin: "All", hair: null, benefits: ["Brightens", "Even tone", "Hydrates"], ingredients: ["Niacinamide 10%", "Vitamin C", "Hyaluronic Acid"], blurb: "Lit-from-within radiance in 4 weeks." },
+  { id: "p2", name: "Gentle Calm Cleanser", category: "Face Wash", price: 950, skin: "Sensitive", hair: null, benefits: ["Calms", "Non-stripping"], ingredients: ["Centella Asiatica", "Panthenol"], blurb: "A morning ritual for reactive skin." },
+  { id: "p3", name: "Velvet Veil SPF 50", category: "Sunscreens", price: 1450, skin: "All", hair: null, benefits: ["Broad spectrum", "No white cast"], ingredients: ["Zinc Oxide", "Niacinamide"], blurb: "Silken finish, daily protection." },
+  { id: "p4", name: "Ceramide Cloud Cream", category: "Moisturizers", price: 1800, skin: "Dry", hair: null, benefits: ["Repairs barrier", "Plumps"], ingredients: ["Ceramide NP", "Squalane"], blurb: "Pillowy hydration that lasts 24h." },
+  { id: "p5", name: "Clear Skin Spot Serum", category: "Acne Care", price: 1200, skin: "Oily", hair: null, benefits: ["Targets breakouts"], ingredients: ["Salicylic 2%", "Tea Tree"], blurb: "Calms a flare without drying out." },
+  { id: "p6", name: "Root Revive Serum", category: "Hair Growth", price: 2200, skin: null, hair: "Thinning", benefits: ["Boosts density"], ingredients: ["Redensyl", "Caffeine", "Biotin"], blurb: "A nightly massage for visible thickness." },
+  { id: "p7", name: "Silken Hair Mask", category: "Hair Care", price: 1650, skin: null, hair: "Dry", benefits: ["Softens", "Reduces frizz"], ingredients: ["Argan Oil", "Keratin"], blurb: "Restores salon-soft strands." },
+  { id: "p8", name: "Timeless Retinol", category: "Anti Aging", price: 2900, skin: "All", hair: null, benefits: ["Smooths lines"], ingredients: ["Encapsulated Retinol 0.3%"], blurb: "Your nightly age-rewind ritual." },
+  { id: "p9", name: "Clarifying Scalp Tonic", category: "Hair Care", price: 1400, skin: null, hair: "Oily", benefits: ["Balances scalp"], ingredients: ["Salicylic", "Rosemary"], blurb: "Fresh, weightless roots all day." },
+  { id: "p10", name: "Bright Eye Elixir", category: "Serums", price: 1950, skin: "All", hair: null, benefits: ["De-puffs", "Brightens"], ingredients: ["Caffeine", "Peptides"], blurb: "Wake up — even when you didn't." },
+  { id: "p11", name: "Soft Foam Oil Wash", category: "Face Wash", price: 990, skin: "Oily", hair: null, benefits: ["Removes excess oil"], ingredients: ["Salicylic", "Green Tea"], blurb: "A clean reset, never tight." },
+  { id: "p12", name: "Hydra Mist", category: "Moisturizers", price: 1100, skin: "All", hair: null, benefits: ["Refreshes"], ingredients: ["Rose water", "HA"], blurb: "A spritz of dew on demand." },
 ];

@@ -1,6 +1,6 @@
 import { db } from "./firebase";
 import { collection, getDocs, setDoc, doc, addDoc, getDoc } from "firebase/firestore";
-import { services as fallbackServices } from "./data";
+import { services as fallbackServices, productList as fallbackProducts } from "./data";
 
 export async function seedClinicDatabase() {
   try {
@@ -11,15 +11,62 @@ export async function seedClinicDatabase() {
       // Self-healing check: check if we have all services in the services collection
       try {
         const servicesSnap = await getDocs(collection(db, "services"));
-        if (servicesSnap.size < 15) {
-          console.log("[Firebase Seeding] Services count is low (" + servicesSnap.size + "). Seeding new services...");
+        let needsSeeding = servicesSnap.size < fallbackServices.length;
+        if (!needsSeeding) {
+          servicesSnap.forEach((doc) => {
+            const data = doc.data();
+            if (!data.overview || !data.symptoms || !data.causes || !data.process || !data.benefits || !data.faqs) {
+              needsSeeding = true;
+            }
+          });
+        }
+        if (needsSeeding) {
+          console.log("[Firebase Seeding] Services details are missing or incomplete. Seeding services with full details...");
           for (const service of fallbackServices) {
-            await setDoc(doc(db, "services", service.slug), service);
+            await setDoc(doc(db, "services", service.slug), service, { merge: true });
           }
-          console.log("[Firebase Seeding] Successfully seeded new services!");
+          console.log("[Firebase Seeding] Successfully seeded services details!");
         }
       } catch (err) {
         console.warn("[Firebase Seeding] Could not auto-seed missing services:", err);
+      }
+
+      // Self-healing check: check if products are in the products collection
+      try {
+        const productsSnap = await getDocs(collection(db, "products"));
+        if (productsSnap.empty) {
+          console.log("[Firebase Seeding] Products collection is empty. Seeding products...");
+          for (const product of fallbackProducts) {
+            await setDoc(doc(db, "products", product.id), product);
+          }
+          console.log("[Firebase Seeding] Successfully seeded products!");
+        }
+      } catch (err) {
+        console.warn("[Firebase Seeding] Could not auto-seed products:", err);
+      }
+
+      // Self-healing check: check if clinic images are present in the gallery
+      try {
+        const gallerySnap = await getDocs(collection(db, "gallery"));
+        let hasClinicPics = false;
+        gallerySnap.forEach((doc) => {
+          if (doc.data().category === "Clinic") {
+            hasClinicPics = true;
+          }
+        });
+        if (!hasClinicPics) {
+          console.log("[Firebase Seeding] No 'Clinic' images found in Firestore. Seeding default clinic images...");
+          const clinicPics = [
+            { src: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1000&q=70", imageUrl: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1000&q=70", category: "Clinic", caption: "Reception" },
+            { src: "https://images.unsplash.com/photo-1631815587646-b85a1bb027e1?w=1000&q=70", imageUrl: "https://images.unsplash.com/photo-1631815587646-b85a1bb027e1?w=1000&q=70", category: "Clinic", caption: "Consultation Room" }
+          ];
+          for (const item of clinicPics) {
+            await addDoc(collection(db, "gallery"), item);
+          }
+          console.log("[Firebase Seeding] Successfully seeded default clinic images!");
+        }
+      } catch (err) {
+        console.warn("[Firebase Seeding] Could not auto-seed clinic gallery images:", err);
       }
 
       // Self-healing check: check if specialties & whyChooseUs are present in homepage collection
@@ -51,18 +98,18 @@ export async function seedClinicDatabase() {
           await setDoc(doc(db, "homepage", "whyChooseUs"), {
             eyebrow: "Clinical Integrity",
             titleMain: "Why Choose",
-            titleCursive: "Dr. Amit Jain",
+            titleCursive: "Dr. Vishakha Patil",
             leftCardBadge: "MD - Dermatology (Skin)",
             leftCardTitleMain: "Dermatology built on clinical",
             leftCardTitleCursive: "Integrity",
-            leftCardDesc: "Dr. Amit Jain believes that skincare is a medical science, not a commercial transaction. We completely reject the aggressive sales targets common in aesthetic clinics, prioritizing your skin's health above all else.",
+            leftCardDesc: "Dr. Vishakha Padmakar Patil believes that skincare is a medical science, not a commercial transaction. We completely reject the aggressive sales targets common in aesthetic clinics, prioritizing your skin's health above all else.",
             leftCardBullets: [
               "10+ Years Active Clinical Experience",
               "15,000+ Successfully Treated Patients",
               "100% Evidence-Based Medical Protocols"
             ],
             items: [
-              { t: "Expert-Led Care Only", d: "Unlike general aesthetic clinics, every consultation, diagnosis, and clinical procedure is directly handled by Dr. Amit Jain himself.", icon: "Award" },
+              { t: "Expert-Led Care Only", d: "Unlike general aesthetic clinics, every consultation, diagnosis, and clinical procedure is directly handled by Dr. Vishakha Patil herself.", icon: "Award" },
               { t: "FDA-Cleared Technology", d: "Equipped with gold-standard, FDA-cleared aesthetic lasers and double-spin clinical PRP centrifuges for maximum efficacy.", icon: "ShieldCheck" },
               { t: "Indian Skin Specialization", d: "Calibrated protocols specially designed for Type IV-VI Indian skin, focusing strictly on melanocyte safety to prevent post-treatment pigmentation.", icon: "Heart" },
               { t: "Transparent & Ethical Pricing", d: "Upfront pricing schedules with absolutely zero forced cosmetic packages, hidden add-ons, or sales targets.", icon: "CheckCircle2" }
@@ -114,6 +161,20 @@ export async function seedClinicDatabase() {
       } catch (err) {
         console.warn("[Firebase Seeding] Could not auto-seed gallery items:", err);
       }
+
+      // Self-healing check: check if chatbot rules are present in the collection
+      try {
+        const rulesSnap = await getDocs(collection(db, "chatbotRules"));
+        if (rulesSnap.empty) {
+          console.log("[Firebase Seeding] No chatbot rules found in Firestore. Seeding default rules...");
+          for (const rule of defaultChatbotRules) {
+            await addDoc(collection(db, "chatbotRules"), rule);
+          }
+          console.log("[Firebase Seeding] Successfully seeded default chatbot rules!");
+        }
+      } catch (err) {
+        console.warn("[Firebase Seeding] Could not auto-seed chatbot rules:", err);
+      }
       return;
     }
 
@@ -121,29 +182,29 @@ export async function seedClinicDatabase() {
 
     // 1. Settings Collection
     await setDoc(doc(db, "settings", "clinic"), {
-      name: "Dr Jain's Skin Care Clinic",
-      doctor: "Dr. Amit Jain",
-      credentials: "MBBS, MD - Skin (Dermatology, Venereology & Leprosy)",
-      tagline: "Advanced Skin & Hair Care Solutions in Pune",
-      phone: "+91 92443 23441",
-      phoneRaw: "919244323441",
-      email: "contact@drjainskinclinic.in",
-      whatsappMessage: "Hello Dr. Jain's Clinic, I'd like to book a consultation.",
-      rating: 4.8,
-      reviews: 140,
+      name: "Anandi Skin & Hair Clinic",
+      doctor: "Dr. Vishakha Padmakar Patil",
+      credentials: "MBBS, MD - Skin (Dermatology, Venereology & Leprosy), Board-Certified Dermatologist",
+      tagline: "Expert Dermatology & Advanced Cosmetology",
+      phone: "+91 84593 23581",
+      phoneRaw: "918459323581",
+      email: "info@anandiclinic.in",
+      whatsappMessage: "Hello Anandi Skin & Hair Clinic, I'd like to book a consultation.",
+      rating: 5.0,
+      reviews: 17,
       address: {
-        line1: "Shop 5, Ground Floor, Olive Shopping Complex",
-        line2: "Jhambhulwadi Road, Chowk, Dattanagar",
-        city: "Katraj, Pune",
+        line1: "46, Datta Nagar Rd, Sai Nagar, Dattanagar",
+        line2: "Chandrabhaga Nagar, Ambegaon Budruk",
+        city: "Pune",
         state: "Maharashtra",
         pincode: "411046",
         country: "India",
       },
       timings: [
-        { day: "Monday – Saturday", hours: "10:30 AM – 2:00 PM,  5:00 PM – 9:00 PM" },
-        { day: "Sunday", hours: "By Appointment" },
+        { day: "Monday – Saturday", hours: "6:00 PM – 9:00 PM" },
+        { day: "Sunday", hours: "Closed" },
       ],
-      mapEmbed: "https://www.google.com/maps?q=Olive+Shopping+Complex+Katraj+Pune&output=embed",
+      mapEmbed: "https://www.google.com/maps?q=Anandi+Skin+&+Hair+Clinic+Ambegaon+Pune&output=embed",
       socials: {
         instagram: "#",
         facebook: "#",
@@ -157,34 +218,34 @@ export async function seedClinicDatabase() {
       subtitle: "Advanced dermatology, cosmetology, and laser solutions customized for Indian skin.",
       imageUrl: "https://images.unsplash.com/photo-1559757175-5700dde675bc?w=1200&q=70",
       ctaText: "Book Appointment",
-      rating: 4.8,
-      reviewsCount: 140,
+      rating: 5.0,
+      reviewsCount: 17,
       stats: [
         { value: "10+", label: "Years of Experience" },
         { value: "15,000+", label: "Happy Patients" },
-        { value: "4.8★", label: "Google Rating" },
+        { value: "5.0★", label: "Google Rating" },
         { value: "20+", label: "Treatments Offered" },
       ],
     });
 
     // 3. Doctor Bio
     await setDoc(doc(db, "doctor", "info"), {
-      name: "Dr. Amit Jain",
-      role: "Chief Dermatologist & Hair Transplant Specialist",
-      qualifications: ["MBBS from prestigious university", "MD - Skin (Dermatology, Venereology & Leprosy)"],
+      name: "Dr. Vishakha Padmakar Patil",
+      role: "Chief Dermatologist & Hair Specialist",
+      qualifications: ["MBBS", "MD - Skin (Dermatology, Venereology & Leprosy), Board-Certified Dermatologist"],
       memberships: [
         "Indian Association of Dermatologists, Venereologists and Leprologists (IADVL)",
         "Cosmetology Society of India (CSI)",
         "Association of Hair Restoration Surgeons (AHRS)",
       ],
-      imageUrl: "https://res.cloudinary.com/dntsjzbei/image/upload/v1780681530/yotg2haunjnbiblavmpb.png",
-      bio: "Dr. Amit Jain is a highly experienced skin specialist based in Katraj, Pune. Over the last 10+ years, he has successfully delivered clinical and aesthetic solutions for thousands of patients with a patient-first ethos.",
+      imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80",
+      bio: "Dr. Vishakha Padmakar Patil is a board-certified dermatologist and hair care specialist based in Katraj/Ambegaon, Pune. With extensive clinical experience, she provides ethical, evidence-based solutions for acne, hair loss, pigmentation, and cosmetology concerns.",
       publications: [
         {
           title: "Annular Elastolytic Giant Cell Granuloma: A Rare Mimicker of Common Annular Dermatoses",
           journal: "BMJ Case Reports",
           journalShort: "BMJ",
-          authors: "Amit Jain, Sahana Ojha, Suyog Dhamale, Vidyadhar R. Sardesai",
+          authors: "Vishakha Patil, Sahana Ojha, Suyog Dhamale, Vidyadhar R. Sardesai",
           year: "2025",
           volume: "Vol. 18, Issue 12, e268061",
           doi: "10.1136/bcr-2025-268061",
@@ -197,7 +258,7 @@ export async function seedClinicDatabase() {
           title: "Symmetrical Drug-Related Intertriginous and Flexural Exanthema (SDRIFE) Unfolded: Diagnostic Pitfalls and Psoriatic Confounders Among Flexural Dermatoses",
           journal: "Cureus",
           journalShort: "Cureus",
-          authors: "Gautam K. Singh, Suyog S. Dhamale, Amit Jain, Anshu Baghel, Vidyadhar R. Sardesai",
+          authors: "Gautam K. Singh, Suyog S. Dhamale, Vishakha Patil, Anshu Baghel, Vidyadhar R. Sardesai",
           year: "2025",
           volume: "Vol. 17, Issue 9, e93524",
           doi: "10.7759/cureus.93524",
@@ -210,7 +271,7 @@ export async function seedClinicDatabase() {
           title: "Factors Responsible for Difficult to Treat Superficial Fungal Infections: A Study from a Tertiary Healthcare Centre in India",
           journal: "Mycoses (Wiley)",
           journalShort: "Mycoses",
-          authors: "Amit Jain, Suyog Dhamale, Vidyadhar Sardesai",
+          authors: "Vishakha Patil, Suyog Dhamale, Vidyadhar Sardesai",
           year: "2021",
           volume: "Vol. 64, Issue 11, pp. 1442–1447",
           doi: "10.1111/myc.13301",
@@ -346,8 +407,8 @@ export async function seedClinicDatabase() {
 
     // 9. SEO Collection
     await setDoc(doc(db, "seo", "home"), {
-      title: "Dr Jain's Skin Care Clinic | Dermatologist in Katraj, Pune",
-      description: "Advanced skin, hair and cosmetology care in Katraj, Pune by Dr. Amit Jain (MBBS, MD). 4.8★ rated. Book an appointment today.",
+      title: "Anandi Skin & Hair Clinic | Dermatologist in Ambegaon, Pune",
+      description: "Advanced skin, hair and cosmetology care in Ambegaon/Katraj, Pune by Dr. Vishakha Patil (MBBS, MD). 5.0★ rated. Book an appointment today.",
       canonicalUrl: "/",
     });
 
@@ -364,12 +425,47 @@ export async function seedClinicDatabase() {
 
     // 11. Footer Collection
     await setDoc(doc(db, "settings", "footer"), {
-      copyright: `© ${new Date().getFullYear()} Dr Jain's Skin Care Clinic. All Rights Reserved.`,
+      copyright: `© ${new Date().getFullYear()} Anandi Skin & Hair Clinic. All Rights Reserved.`,
       disclaimer: "Disclaimer: Medical information presented on this website is for educational purposes only. Please consult a qualified doctor for clinical diagnosis and treatments.",
     });
+
+    // 12. Products Collection
+    for (const p of fallbackProducts) {
+      await setDoc(doc(db, "products", p.id), p);
+    }
+
+    // 13. Chatbot Rules Collection
+    for (const rule of defaultChatbotRules) {
+      await addDoc(collection(db, "chatbotRules"), rule);
+    }
 
     console.log("[Firebase Seeding] All collections successfully seeded to Firestore!");
   } catch (error) {
     console.error("[Firebase Seeding] Error during database seeding: ", error);
   }
 }
+
+const defaultChatbotRules = [
+  { track: "skin", if: ["Acne", "Oily Skin"], then: ["Soft Foam Oil Wash", "Clear Skin Spot Serum", "Acne Treatment Consultation"] },
+  { track: "skin", if: ["Acne", "Sensitive Skin"], then: ["Gentle Calm Cleanser", "Clear Skin Spot Serum", "Acne Treatment Consultation"] },
+  { track: "skin", if: ["Pigmentation"], then: ["Glow Renew Serum", "Velvet Veil SPF 50", "Pigmentation Reset Session"] },
+  { track: "skin", if: ["Dark Spots"], then: ["Glow Renew Serum", "Velvet Veil SPF 50", "Pigmentation Reset Session"] },
+  { track: "skin", if: ["Dry Skin", "Fine Lines"], then: ["Ceramide Cloud Cream", "Timeless Retinol", "Anti Aging Lift"] },
+  { track: "skin", if: ["Sensitive Skin"], then: ["Gentle Calm Cleanser", "Hydra Mist"] },
+  { track: "skin", if: ["Fine Lines"], then: ["Timeless Retinol", "Bright Eye Elixir"] },
+  { track: "skin", if: ["Oily Skin"], then: ["Soft Foam Oil Wash", "Velvet Veil SPF 50"] },
+  { track: "skin", if: ["Open Pores"], then: ["Soft Foam Oil Wash", "Glow Renew Serum"] },
+  { track: "skin", if: ["Sunburn & Tan"], then: ["Velvet Veil SPF 50", "Hydra Mist"] },
+  { track: "skin", if: ["Under-Eye Circles"], then: ["Bright Eye Elixir"] },
+  { track: "skin", if: ["Uneven Texture"], then: ["Glow Renew Serum", "Timeless Retinol"] },
+  { track: "skin", if: ["Acne Scars"], then: ["Glow Renew Serum", "Acne Treatment Consultation"] },
+  { track: "hair", if: ["Hair Fall", "Oily Scalp"], then: ["Clarifying Scalp Tonic", "Root Revive Serum", "PRP Hair Consultation"] },
+  { track: "hair", if: ["Hair Fall", "Dry Scalp"], then: ["Silken Hair Mask", "Root Revive Serum"] },
+  { track: "hair", if: ["Bald Patches"], then: ["PRP Hair Therapy", "Hair Transplant Consultation"] },
+  { track: "hair", if: ["Dandruff"], then: ["Clarifying Scalp Tonic"] },
+  { track: "hair", if: ["Split Ends"], then: ["Silken Hair Mask"] },
+  { track: "hair", if: ["Premature Graying"], then: ["Root Revive Serum", "Free Hair Analysis"] },
+  { track: "hair", if: ["Itchy Scalp"], then: ["Clarifying Scalp Tonic"] },
+  { track: "hair", if: ["Thin Hair"], then: ["Root Revive Serum", "PRP Hair Consultation"] }
+];
+

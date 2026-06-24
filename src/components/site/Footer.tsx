@@ -7,7 +7,7 @@ export function Footer() {
     <footer className="mt-24 bg-foreground text-background">
       <div className="mx-auto max-w-7xl px-5 lg:px-10 py-20 grid gap-12 lg:grid-cols-4">
         <div>
-          <div className="font-display text-3xl">Dr. Jain's.</div>
+          <div className="font-display text-3xl">Anandi Clinic.</div>
           <p className="mt-4 text-sm text-background/70 leading-relaxed">
             {clinic.tagline}. Expert dermatology, cosmetology & hair transplant solutions by {clinic.doctor}.
           </p>
@@ -28,7 +28,7 @@ export function Footer() {
           <ul className="space-y-2 text-sm text-background/70">
             <li><Link to="/services">Treatments</Link></li>
             <li><Link to="/products">Shop</Link></li>
-            <li><Link to="/doctors">Our Doctor</Link></li>
+            <li><Link to="/about">About Us</Link></li>
             <li><Link to="/before-after">Real Results</Link></li>
             <li><Link to="/blog">Journal</Link></li>
           </ul>
@@ -59,8 +59,10 @@ export function Footer() {
           </a>
         </div>
       </div>
-      <div className="border-t border-background/10 py-6 text-center text-xs text-background/50">
-        © {new Date().getFullYear()} {clinic.name}. All rights reserved.
+      <div className="border-t border-background/10 py-6 text-center text-xs text-background/50 flex flex-col sm:flex-row justify-center items-center gap-2">
+        <span>© {new Date().getFullYear()} {clinic.name}. All rights reserved.</span>
+        <span className="hidden sm:inline text-background/10">|</span>
+        <Link to="/admin" className="text-background/10 hover:text-background/30 transition-colors">Admin Panel</Link>
       </div>
     </footer>
   );

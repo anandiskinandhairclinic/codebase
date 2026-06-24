@@ -5,7 +5,7 @@ import { getBlogPosts, productImage, type BlogPost } from "@/lib/firebaseDataAda
 const categories = ["All", "Skin Care", "Hair Care", "Dermatology", "Nutrition", "Lifestyle", "Beauty Tips"];
 
 export const Route = createFileRoute("/blog")({
-  head: () => ({ meta: [{ title: "Journal — Dr. Jain's Skin Care Clinic" }] }),
+  head: () => ({ meta: [{ title: "Journal — Anandi Skin & Hair Clinic" }] }),
   component: Page,
 });
 
@@ -33,16 +33,18 @@ function Page() {
         <div className="mx-auto max-w-7xl grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map(p => (
             <article key={p.slug} className="group rounded-3xl bg-card border border-border overflow-hidden">
-              <div className="aspect-[4/3] bg-muted overflow-hidden">
+              <Link to="/blog/$slug" params={{ slug: p.slug }} className="block aspect-[4/3] bg-muted overflow-hidden">
                 <img src={p.imageUrl || productImage} alt="" loading="lazy" className="size-full object-cover group-hover:scale-105 transition-transform duration-700" />
-              </div>
+              </Link>
               <div className="p-6">
                 <div className="text-xs uppercase tracking-wider text-primary">{p.category} · {p.read}</div>
-                <h2 className="font-display text-2xl mt-2 leading-snug">{p.title}</h2>
+                <Link to="/blog/$slug" params={{ slug: p.slug }} className="hover:text-primary transition-colors">
+                  <h2 className="font-display text-2xl mt-2 leading-snug">{p.title}</h2>
+                </Link>
                 <p className="text-sm text-muted-foreground mt-3">{p.excerpt}</p>
                 <div className="mt-5 flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">{p.date}</span>
-                  <Link to="/blog" className="text-primary">Read ›</Link>
+                  <Link to="/blog/$slug" params={{ slug: p.slug }} className="text-primary font-semibold">Read ›</Link>
                 </div>
               </div>
             </article>

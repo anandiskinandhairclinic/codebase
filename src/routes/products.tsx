@@ -1,25 +1,33 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { productList, productCategories, skinTypes, hairTypes, productImage } from "@/lib/firebaseDataAdapter";
+import { getProductsList, productCategories, skinTypes, hairTypes, productImage, type Product } from "@/lib/firebaseDataAdapter";
 import { Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useCart } from "@/context/CartContext";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/products")({
-  head: () => ({ meta: [{ title: "Shop — Dr. Jain's Skin Care Clinic" }] }),
+  head: () => ({ meta: [{ title: "Shop — Anandi Skin & Hair Clinic" }] }),
   component: Products,
 });
 
 function Products() {
+  const { addToCart } = useCart();
+  const [products, setProducts] = useState<Product[]>([]);
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("All");
   const [skin, setSkin] = useState("All");
   const [hair, setHair] = useState("All");
 
-  const filtered = useMemo(() => productList.filter(p =>
+  useEffect(() => {
+    getProductsList().then(setProducts);
+  }, []);
+
+  const filtered = useMemo(() => products.filter(p =>
     (cat === "All" || p.category === cat) &&
     (skin === "All" || p.skin === skin || p.skin === "All") &&
     (hair === "All" || p.hair === hair) &&
     (q === "" || p.name.toLowerCase().includes(q.toLowerCase()))
-  ), [q, cat, skin, hair]);
+  ), [products, q, cat, skin, hair]);
 
   return (
     <main className="pb-24">
@@ -46,7 +54,7 @@ function Products() {
           {filtered.map(p => (
             <Link to="/products/$id" params={{ id: p.id }} key={p.id} className="group rounded-3xl bg-card border border-border overflow-hidden hover:shadow-card transition-shadow">
               <div className="aspect-square overflow-hidden bg-muted">
-                <img src={productImage} alt={p.name} loading="lazy" className="size-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <img src={p.imageUrl || productImage} alt={p.name} loading="lazy" className="size-full object-cover group-hover:scale-105 transition-transform duration-700" />
               </div>
               <div className="p-5">
                 <div className="text-xs uppercase tracking-wider text-muted-foreground">{p.category}</div>
@@ -54,7 +62,20 @@ function Products() {
                 <p className="text-sm text-muted-foreground mt-1.5 line-clamp-2">{p.blurb}</p>
                 <div className="mt-4 flex items-center justify-between">
                   <span className="font-medium">₹{p.price.toLocaleString()}</span>
-                  <span className="text-xs text-primary">View ›</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        addToCart(p);
+                        toast.success(`Added ${p.name} to cart!`);
+                      }}
+                      className="rounded-full bg-[#ecdcc9]/60 hover:bg-primary hover:text-primary-foreground text-[10px] text-[#5c4a37] px-3 py-1.5 font-medium transition-colors cursor-pointer"
+                    >
+                      Add to Cart
+                    </button>
+                    <span className="text-xs text-primary group-hover:translate-x-0.5 transition-transform">View ›</span>
+                  </div>
                 </div>
               </div>
             </Link>

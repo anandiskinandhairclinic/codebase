@@ -15,6 +15,9 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Chatbot } from "@/components/site/Chatbot";
+import { seedClinicDatabase } from "@/lib/firebaseSeeding";
+import { CartProvider } from "@/context/CartContext";
+import { FloatingActions } from "@/components/site/FloatingActions";
 
 function NotFoundComponent() {
   return (
@@ -46,10 +49,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Dr. Jain's Skin Care Clinic — Advanced Skin & Hair Solutions in Pune" },
-      { name: "description", content: "Expert dermatology, cosmetology, and hair transplant solutions by Dr. Amit Jain. MBBS, MD Skin. Located in Katraj, Pune." },
-      { property: "og:title", content: "Dr. Jain's Skin Care Clinic — Advanced Skin & Hair Solutions" },
-      { property: "og:description", content: "Expert dermatology, cosmetology, and hair transplant solutions by Dr. Amit Jain in Katraj, Pune." },
+      { title: "Anandi Skin & Hair Clinic — Expert Dermatologist in Ambegaon & Katraj, Pune" },
+      { name: "description", content: "Advanced skin, hair, and cosmetology care by Dr. Vishakha Padmakar Patil at Anandi Skin & Hair Clinic, Dattanagar, Ambegaon Budruk, Pune." },
+      { property: "og:title", content: "Anandi Skin & Hair Clinic — Expert Dermatology & Cosmetology" },
+      { property: "og:description", content: "Personalized clinical treatments for skin, hair, and cosmetic concerns by Dr. Vishakha Padmakar Patil in Pune." },
       { property: "og:type", content: "website" },
     ],
     links: [
@@ -65,6 +68,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+import { Toaster } from "@/components/ui/sonner";
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
@@ -78,12 +83,24 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isAdmin = pathname.startsWith("/admin");
+
+  useEffect(() => {
+    // Trigger clinic database seeding and updates check
+    seedClinicDatabase();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
-      {!isAdmin && <Header />}
-      <Outlet />
-      {!isAdmin && <Footer />}
-      {!isAdmin && <Chatbot />}
+      <CartProvider>
+        {!isAdmin && <Header />}
+        <Outlet />
+        {!isAdmin && <Footer />}
+        {!isAdmin && <Chatbot />}
+        {!isAdmin && <FloatingActions />}
+        <Toaster />
+      </CartProvider>
     </QueryClientProvider>
   );
 }
+
+

@@ -1,14 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, X, Stethoscope } from "lucide-react";
+import { Menu, X, Stethoscope, ShoppingBag } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/context/CartContext";
+import { CartDrawer } from "@/components/site/CartDrawer";
 
 const nav = [
   { to: "/", label: "Home" },
-  { to: "/about", label: "About" },
+  { to: "/about", label: "About Us" },
   { to: "/services", label: "Treatments" },
   { to: "/products", label: "Shop" },
-  { to: "/doctors", label: "Our Doctor" },
   { to: "/before-after", label: "Results" },
   { to: "/blog", label: "Journal" },
   { to: "/contact", label: "Contact" },
@@ -16,6 +17,8 @@ const nav = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const { cartCount, isCartOpen, setCartOpen } = useCart();
+
   return (
     <header className="sticky top-0 z-40 backdrop-blur bg-background/75 border-b border-border/60">
       <div className="mx-auto max-w-7xl px-5 lg:px-10 h-20 flex items-center justify-between">
@@ -23,7 +26,7 @@ export function Header() {
           <span className="grid place-items-center size-9 rounded-full bg-primary text-primary-foreground">
             <Stethoscope className="size-4" strokeWidth={1.6} />
           </span>
-          <span className="font-display text-2xl tracking-tight">Dr. Jain's<span className="text-primary">.</span></span>
+          <span className="font-display text-2xl tracking-tight">Anandi Clinic<span className="text-primary">.</span></span>
         </Link>
         <nav className="hidden lg:flex items-center gap-9 text-sm">
           {nav.map((n) => (
@@ -38,14 +41,33 @@ export function Header() {
             </Link>
           ))}
         </nav>
-        <div className="hidden lg:flex items-center gap-2">
-          <Button asChild variant="ghost" className="rounded-full"><Link to="/admin">Admin</Link></Button>
-          <Button asChild className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"><Link to="/appointment">Book Consult</Link></Button>
+        
+        <div className="flex items-center gap-2">
+          {/* Cart Icon Button */}
+          <button
+            onClick={() => setCartOpen(true)}
+            className="relative p-2.5 hover:bg-muted rounded-full transition-colors cursor-pointer text-foreground/80 hover:text-foreground mr-1"
+            aria-label="Shopping Cart"
+          >
+            <ShoppingBag className="size-5" />
+            {cartCount > 0 && (
+              <span className="absolute top-0.5 right-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full size-4.5 flex items-center justify-center animate-in scale-in duration-300">
+                {cartCount}
+              </span>
+            )}
+          </button>
+
+          <div className="hidden lg:flex items-center gap-2">
+            <Button asChild variant="ghost" className="rounded-full"><Link to="/admin">Admin</Link></Button>
+            <Button asChild className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"><Link to="/appointment">Book Consult</Link></Button>
+          </div>
+
+          <button className="lg:hidden" onClick={() => setOpen(!open)} aria-label="menu">
+            {open ? <X /> : <Menu />}
+          </button>
         </div>
-        <button className="lg:hidden" onClick={() => setOpen(!open)} aria-label="menu">
-          {open ? <X /> : <Menu />}
-        </button>
       </div>
+      
       {open && (
         <div className="lg:hidden border-t border-border/60 bg-background">
           <div className="px-5 py-4 flex flex-col gap-3">
@@ -56,6 +78,9 @@ export function Header() {
           </div>
         </div>
       )}
+
+      {/* Cart Side Drawer */}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setCartOpen(false)} />
     </header>
   );
 }

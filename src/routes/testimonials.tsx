@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { getTestimonialsList, type Testimonial } from "@/lib/firebaseDataAdapter";
 
 export const Route = createFileRoute("/testimonials")({
-  head: () => ({ meta: [{ title: "Patient Stories — Dr. Jain's Skin Care Clinic" }] }),
+  head: () => ({ meta: [{ title: "Patient Stories — Anandi Skin & Hair Clinic" }] }),
   component: Page,
 });
 
