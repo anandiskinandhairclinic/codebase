@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { getBlogPostBySlug, productImage } from "@/lib/firebaseDataAdapter";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/blog/$slug")({
+export const Route = createFileRoute("/blog_/$slug")({
   component: BlogDetail,
   notFoundComponent: () => <div className="p-20 text-center">Post not found.</div>,
 });

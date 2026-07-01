@@ -17,7 +17,7 @@ export const Route = createFileRoute("/services")({
 
 function Services() {
   const [treatments, setTreatments] = useState<Treatment[]>([]);
-  const [activeTab, setActiveTab] = useState<"All" | "Skin" | "Hair" | "Cosmetology">("All");
+  const [activeTab, setActiveTab] = useState<"All" | "Skin" | "Nail" | "Hair" | "Lasers" | "Procedure" | "Aesthetic Procedure">("All");
 
   useEffect(() => {
     getTreatments().then(setTreatments);
@@ -47,7 +47,7 @@ function Services() {
 
           {/* Categories Tab selector */}
           <div className="pt-8 flex justify-center gap-3 flex-wrap">
-            {(["All", "Skin", "Hair", "Cosmetology"] as const).map((tab) => (
+            {(["All", "Skin", "Nail", "Hair", "Lasers", "Procedure", "Aesthetic Procedure"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -57,7 +57,11 @@ function Services() {
                     : "bg-white text-[#8a7560] border-[#ecdcc9] hover:bg-[#faf6f0] hover:scale-[1.01]"
                 }`}
               >
-                {tab} Treatments
+                {tab === "All" ? "All Services" : 
+                 tab === "Lasers" ? "Lasers" : 
+                 tab === "Procedure" ? "Procedures" : 
+                 tab === "Aesthetic Procedure" ? "Aesthetic Procedures" : 
+                 `${tab} Treatments`}
               </button>
             ))}
           </div>

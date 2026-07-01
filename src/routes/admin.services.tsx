@@ -253,8 +253,11 @@ function AdminServices() {
                   required
                 >
                   <option value="Skin">Skin</option>
+                  <option value="Nail">Nail</option>
                   <option value="Hair">Hair</option>
-                  <option value="Cosmetology">Cosmetology</option>
+                  <option value="Lasers">Lasers</option>
+                  <option value="Procedure">Procedure</option>
+                  <option value="Aesthetic Procedure">Aesthetic Procedure</option>
                 </select>
               </div>
               <div className="space-y-1">

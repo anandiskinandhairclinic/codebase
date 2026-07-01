@@ -157,12 +157,29 @@ export async function getTreatments(): Promise<Treatment[]> {
   }));
 }
 
-/** Categorize a backend service into "Skin" or "Hair" for the new UI */
+/** Categorize a backend service into the correct UI category */
 function categorizeService(s: any): string {
+  const validCategories = ["Skin", "Nail", "Hair", "Lasers", "Procedure", "Aesthetic Procedure"];
+  if (s.category && validCategories.includes(s.category)) {
+    return s.category;
+  }
   const slug = (s.slug || "").toLowerCase();
   const title = (s.title || "").toLowerCase();
-  const hairKeywords = ["hair", "baldness", "prp", "scalp", "dandruff", "trichology"];
-  if (hairKeywords.some((k) => slug.includes(k) || title.includes(k))) return "Hair";
+  
+  if (slug.includes("nail") || title.includes("nail")) return "Nail";
+  if (slug.includes("laser") || title.includes("laser") || slug.includes("mnrf") || slug.includes("hifu")) return "Lasers";
+  if (slug.includes("procedure") || slug.includes("surgery") || slug.includes("excision") || slug.includes("removal") || slug.includes("biopsy") || slug.includes("lobuloplasty") || slug.includes("cautery") || slug.includes("cyst")) return "Procedure";
+  
+  const hairKeywords = ["hair", "baldness", "prp", "scalp", "dandruff", "trichology", "hairfall"];
+  const aestheticKeywords = ["peel", "facial", "botox", "filler", "glutathione", "microneedling", "aesthetic", "cosmetology", "medifacial", "hydrafacial", "makeup", "subcision", "dermaroller", "dermapen"];
+  
+  if (hairKeywords.some((k) => slug.includes(k) || title.includes(k))) {
+    if (slug.includes("face")) return "Aesthetic Procedure";
+    return "Hair";
+  }
+  if (aestheticKeywords.some((k) => slug.includes(k) || title.includes(k))) {
+    return "Aesthetic Procedure";
+  }
   return "Skin";
 }
 

@@ -5,7 +5,7 @@ import { getServiceBySlug } from "@/lib/firebaseDataAdapter";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
-export const Route = createFileRoute("/services/$slug")({
+export const Route = createFileRoute("/services_/$slug")({
   component: ServiceDetail,
   notFoundComponent: () => <div className="p-20 text-center">Treatment not found.</div>,
 });

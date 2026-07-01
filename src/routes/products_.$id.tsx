@@ -4,7 +4,7 @@ import { Star, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 
-export const Route = createFileRoute("/products/$id")({
+export const Route = createFileRoute("/products_/$id")({
   component: Detail,
   notFoundComponent: () => <div className="p-20 text-center">Not found.</div>,
 });

@@ -20,9 +20,9 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
-import { Route as ProductsIdRouteImport } from './routes/products.$id'
-import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as ServicesSlugRouteImport } from './routes/services_.$slug'
+import { Route as ProductsIdRouteImport } from './routes/products_.$id'
+import { Route as BlogSlugRouteImport } from './routes/blog_.$slug'
 import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminServicesRouteImport } from './routes/admin.services'
@@ -90,19 +90,19 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   getParentRoute: () => AdminRoute,
 } as any)
 const ServicesSlugRoute = ServicesSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => ServicesRoute,
+  id: '/services_/$slug',
+  path: '/services/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ProductsIdRoute = ProductsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ProductsRoute,
+  id: '/products_/$id',
+  path: '/products/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => BlogRoute,
+  id: '/blog_/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminTestimonialsRoute = AdminTestimonialsRouteImport.update({
   id: '/testimonials',
@@ -161,10 +161,10 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/appointment': typeof AppointmentRoute
   '/before-after': typeof BeforeAfterRoute
-  '/blog': typeof BlogRouteWithChildren
+  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
-  '/products': typeof ProductsRouteWithChildren
-  '/services': typeof ServicesRouteWithChildren
+  '/products': typeof ProductsRoute
+  '/services': typeof ServicesRoute
   '/testimonials': typeof TestimonialsRoute
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/before-after': typeof AdminBeforeAfterRoute
@@ -186,10 +186,10 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/appointment': typeof AppointmentRoute
   '/before-after': typeof BeforeAfterRoute
-  '/blog': typeof BlogRouteWithChildren
+  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
-  '/products': typeof ProductsRouteWithChildren
-  '/services': typeof ServicesRouteWithChildren
+  '/products': typeof ProductsRoute
+  '/services': typeof ServicesRoute
   '/testimonials': typeof TestimonialsRoute
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/before-after': typeof AdminBeforeAfterRoute
@@ -213,10 +213,10 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/appointment': typeof AppointmentRoute
   '/before-after': typeof BeforeAfterRoute
-  '/blog': typeof BlogRouteWithChildren
+  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
-  '/products': typeof ProductsRouteWithChildren
-  '/services': typeof ServicesRouteWithChildren
+  '/products': typeof ProductsRoute
+  '/services': typeof ServicesRoute
   '/testimonials': typeof TestimonialsRoute
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/before-after': typeof AdminBeforeAfterRoute
@@ -228,9 +228,9 @@ export interface FileRoutesById {
   '/admin/services': typeof AdminServicesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/products/$id': typeof ProductsIdRoute
-  '/services/$slug': typeof ServicesSlugRoute
+  '/blog_/$slug': typeof BlogSlugRoute
+  '/products_/$id': typeof ProductsIdRoute
+  '/services_/$slug': typeof ServicesSlugRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -307,9 +307,9 @@ export interface FileRouteTypes {
     | '/admin/services'
     | '/admin/settings'
     | '/admin/testimonials'
-    | '/blog/$slug'
-    | '/products/$id'
-    | '/services/$slug'
+    | '/blog_/$slug'
+    | '/products_/$id'
+    | '/services_/$slug'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -319,11 +319,14 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AppointmentRoute: typeof AppointmentRoute
   BeforeAfterRoute: typeof BeforeAfterRoute
-  BlogRoute: typeof BlogRouteWithChildren
+  BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
-  ProductsRoute: typeof ProductsRouteWithChildren
-  ServicesRoute: typeof ServicesRouteWithChildren
+  ProductsRoute: typeof ProductsRoute
+  ServicesRoute: typeof ServicesRoute
   TestimonialsRoute: typeof TestimonialsRoute
+  BlogSlugRoute: typeof BlogSlugRoute
+  ProductsIdRoute: typeof ProductsIdRoute
+  ServicesSlugRoute: typeof ServicesSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -405,26 +408,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/services/$slug': {
-      id: '/services/$slug'
-      path: '/$slug'
+    '/services_/$slug': {
+      id: '/services_/$slug'
+      path: '/services/$slug'
       fullPath: '/services/$slug'
       preLoaderRoute: typeof ServicesSlugRouteImport
-      parentRoute: typeof ServicesRoute
+      parentRoute: typeof rootRouteImport
     }
-    '/products/$id': {
-      id: '/products/$id'
-      path: '/$id'
+    '/products_/$id': {
+      id: '/products_/$id'
+      path: '/products/$id'
       fullPath: '/products/$id'
       preLoaderRoute: typeof ProductsIdRouteImport
-      parentRoute: typeof ProductsRoute
+      parentRoute: typeof rootRouteImport
     }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/$slug'
+    '/blog_/$slug': {
+      id: '/blog_/$slug'
+      path: '/blog/$slug'
       fullPath: '/blog/$slug'
       preLoaderRoute: typeof BlogSlugRouteImport
-      parentRoute: typeof BlogRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/testimonials': {
       id: '/admin/testimonials'
@@ -529,51 +532,20 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface BlogRouteChildren {
-  BlogSlugRoute: typeof BlogSlugRoute
-}
-
-const BlogRouteChildren: BlogRouteChildren = {
-  BlogSlugRoute: BlogSlugRoute,
-}
-
-const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
-
-interface ProductsRouteChildren {
-  ProductsIdRoute: typeof ProductsIdRoute
-}
-
-const ProductsRouteChildren: ProductsRouteChildren = {
-  ProductsIdRoute: ProductsIdRoute,
-}
-
-const ProductsRouteWithChildren = ProductsRoute._addFileChildren(
-  ProductsRouteChildren,
-)
-
-interface ServicesRouteChildren {
-  ServicesSlugRoute: typeof ServicesSlugRoute
-}
-
-const ServicesRouteChildren: ServicesRouteChildren = {
-  ServicesSlugRoute: ServicesSlugRoute,
-}
-
-const ServicesRouteWithChildren = ServicesRoute._addFileChildren(
-  ServicesRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AppointmentRoute: AppointmentRoute,
   BeforeAfterRoute: BeforeAfterRoute,
-  BlogRoute: BlogRouteWithChildren,
+  BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
-  ProductsRoute: ProductsRouteWithChildren,
-  ServicesRoute: ServicesRouteWithChildren,
+  ProductsRoute: ProductsRoute,
+  ServicesRoute: ServicesRoute,
   TestimonialsRoute: TestimonialsRoute,
+  BlogSlugRoute: BlogSlugRoute,
+  ProductsIdRoute: ProductsIdRoute,
+  ServicesSlugRoute: ServicesSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
