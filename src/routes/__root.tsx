@@ -8,7 +8,7 @@ import {
   Scripts,
   useRouterState,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -18,6 +18,7 @@ import { Chatbot } from "@/components/site/Chatbot";
 import { seedClinicDatabase } from "@/lib/firebaseSeeding";
 import { CartProvider } from "@/context/CartContext";
 import { FloatingActions } from "@/components/site/FloatingActions";
+import { CallbackPopup } from "@/components/site/CallbackPopup";
 
 function NotFoundComponent() {
   return (
@@ -97,6 +98,7 @@ function RootComponent() {
         {!isAdmin && <Footer />}
         {!isAdmin && <Chatbot />}
         {!isAdmin && <FloatingActions />}
+        {!isAdmin && <CallbackPopup />}
         <Toaster />
       </CartProvider>
     </QueryClientProvider>

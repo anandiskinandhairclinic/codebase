@@ -120,9 +120,16 @@ const hairAdditional = [
   "None"
 ];
 
-export function Chatbot() {
+interface ChatbotProps {
+  open?: boolean;
+  setOpen?: (open: boolean) => void;
+}
+
+export function Chatbot({ open: propOpen, setOpen: propSetOpen }: ChatbotProps = {}) {
   const { addToCart, setCartOpen } = useCart();
-  const [open, setOpen] = useState(false);
+  const [localOpen, setLocalOpen] = useState(false);
+  const open = propOpen !== undefined ? propOpen : localOpen;
+  const setOpen = propSetOpen !== undefined ? propSetOpen : setLocalOpen;
   const [step, setStep] = useState<"intro" | "concern" | "duration" | "type" | "additional" | "result">("intro");
   const [track, setTrack] = useState<"skin" | "hair" | null>(null);
   const [selectedConcern, setSelectedConcern] = useState<string>("");

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Mail, MapPin, Phone, Clock } from "lucide-react";
 import { clinic, whatsappLink, telLink } from "@/lib/clinic";
+import { createAppointment } from "@/lib/firebaseDataAdapter";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({ meta: [{ title: "Contact — Anandi Skin & Hair Clinic" }] }),
@@ -12,21 +13,39 @@ function Page() {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
+    const nameVal = (formData.get("name") || "") as string;
+    const emailVal = (formData.get("email") || "") as string;
+    const phoneVal = (formData.get("phone") || "") as string;
+    const messageVal = (formData.get("message") || "") as string;
+
     try {
+      // 1. Submit email alert
       await fetch("https://formsubmit.co/ajax/info@anandiclinic.in", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({
-          _subject: `Contact Form: ${formData.get("name")}`,
-          Name: formData.get("name"),
-          Email: formData.get("email"),
-          Phone: formData.get("phone"),
-          Message: formData.get("message"),
+          _subject: `Contact Form: ${nameVal}`,
+          Name: nameVal,
+          Email: emailVal,
+          Phone: phoneVal,
+          Message: messageVal,
         }),
       });
+
+      // 2. Save in Firestore appointments log
+      await createAppointment({
+        name: nameVal.trim(),
+        phone: phoneVal.trim(),
+        email: emailVal.trim() || undefined,
+        service: "Contact Inquiry",
+        preferredDate: "Contact Form Submission",
+        message: messageVal.trim() || undefined,
+      });
+
       alert("Message sent! We'll get back to you shortly.");
       form.reset();
-    } catch {
+    } catch (err) {
+      console.error("Error submitting contact form:", err);
       alert("Message sent! We'll get back to you shortly.");
     }
   };

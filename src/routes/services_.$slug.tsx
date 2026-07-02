@@ -43,7 +43,7 @@ function ServiceDetail() {
   }
 
   // Fallback image if none specified
-  const displayImage = service.image || service.imageUrl || "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1200&q=70";
+  const displayImage = service.image || service.imageUrl || "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&q=70";
 
   return (
     <main className="pb-24 bg-[#fdfaf6] min-h-screen">

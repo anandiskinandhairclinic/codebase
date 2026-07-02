@@ -2,9 +2,19 @@ import React from "react";
 import { MessageCircle, Phone } from "lucide-react";
 import { whatsappLink, telLink } from "@/lib/firebaseDataAdapter";
 
-export function FloatingActions() {
+interface FloatingActionsProps {
+  chatbotOpen?: boolean;
+}
+
+export function FloatingActions({ chatbotOpen = false }: FloatingActionsProps) {
   return (
-    <div className="fixed bottom-[92px] right-[28px] z-50 flex flex-col gap-3 pointer-events-auto">
+    <div 
+      className={`fixed z-50 flex flex-col gap-3 pointer-events-auto transition-all duration-300 ${
+        chatbotOpen 
+          ? "right-[28px] lg:right-[420px] bottom-[92px] max-lg:opacity-0 max-lg:pointer-events-none max-lg:scale-95" 
+          : "right-[28px] bottom-[92px]"
+      }`}
+    >
       {/* Phone Call Bubble - Warm Champagne / Gold */}
       <a
         href={telLink}

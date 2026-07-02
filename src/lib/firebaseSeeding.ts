@@ -1,5 +1,5 @@
 import { db } from "./firebase";
-import { collection, getDocs, setDoc, doc, addDoc, getDoc } from "firebase/firestore";
+import { collection, getDocs, setDoc, doc, addDoc, getDoc, deleteDoc } from "firebase/firestore";
 import { services as fallbackServices, productList as fallbackProducts } from "./data";
 
 export async function seedClinicDatabase() {
@@ -11,7 +11,7 @@ export async function seedClinicDatabase() {
       // Self-healing check: check if we have all services in the services collection
       try {
         const servicesSnap = await getDocs(collection(db, "services"));
-        let needsSeeding = servicesSnap.size < fallbackServices.length;
+        let needsSeeding = servicesSnap.size !== fallbackServices.length;
         if (!needsSeeding) {
           servicesSnap.forEach((doc) => {
             const data = doc.data();
@@ -21,11 +21,25 @@ export async function seedClinicDatabase() {
           });
         }
         if (needsSeeding) {
-          console.log("[Firebase Seeding] Services details are missing or incomplete. Seeding services with full details...");
-          for (const service of fallbackServices) {
-            await setDoc(doc(db, "services", service.slug), service, { merge: true });
+          console.log("[Firebase Seeding] Services count mismatch or incomplete. Wiping services collection and seeding fresh...");
+          for (const d of servicesSnap.docs) {
+            await deleteDoc(d.ref);
           }
-          console.log("[Firebase Seeding] Successfully seeded services details!");
+          for (const service of fallbackServices) {
+            await setDoc(doc(db, "services", service.slug), service);
+          }
+          console.log("[Firebase Seeding] Successfully seeded 73 services details!");
+        } else {
+          console.log("[Firebase Seeding] Healing existing service cover images...");
+          for (const service of fallbackServices) {
+            if (service.imageUrl) {
+              await setDoc(doc(db, "services", service.slug), {
+                image: service.imageUrl,
+                imageUrl: service.imageUrl
+              }, { merge: true });
+            }
+          }
+          console.log("[Firebase Seeding] Curated service cover images successfully healed in Firestore!");
         }
       } catch (err) {
         console.warn("[Firebase Seeding] Could not auto-seed missing services:", err);
@@ -126,37 +140,37 @@ export async function seedClinicDatabase() {
         let hasBeforeAfter = false;
         gallerySnap.forEach((doc) => {
           const data = doc.data();
-          if (data.category === "Before & After" || (data.beforeSrc && data.afterSrc)) {
+          if (data.category === "Before & After" || data.category === "Patient Photos" || (data.beforeSrc && data.afterSrc)) {
             hasBeforeAfter = true;
           }
         });
 
         if (!hasBeforeAfter) {
-          console.log("[Firebase Seeding] No 'Before & After' items found in Firestore. Seeding mock transformations...");
+          console.log("[Firebase Seeding] No 'Patient Photos' items found in Firestore. Seeding mock transformations...");
           const beforeAfterItems = [
             {
               beforeSrc: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=900&q=70",
               afterSrc: "https://images.unsplash.com/photo-1556228852-80b6e5eeff06?w=900&q=70",
-              category: "Before & After",
+              category: "Patient Photos",
               caption: "Acne Control Therapy"
             },
             {
               beforeSrc: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=900&q=70",
               afterSrc: "https://images.unsplash.com/photo-1614109800763-7b46d0a9ad44?w=900&q=70",
-              category: "Before & After",
+              category: "Patient Photos",
               caption: "Pigmentation & Tone Laser"
             },
             {
               beforeSrc: "https://images.unsplash.com/photo-1559599101-f09722fb4948?w=900&q=70",
               afterSrc: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=900&q=70",
-              category: "Before & After",
+              category: "Patient Photos",
               caption: "PRP Hair Density Therapy"
             }
           ];
           for (const item of beforeAfterItems) {
             await addDoc(collection(db, "gallery"), item);
           }
-          console.log("[Firebase Seeding] Successfully injected mock Before & After transformations!");
+          console.log("[Firebase Seeding] Successfully injected mock Patient Photos transformations!");
         }
       } catch (err) {
         console.warn("[Firebase Seeding] Could not auto-seed gallery items:", err);
@@ -291,37 +305,155 @@ export async function seedClinicDatabase() {
     // 5. Testimonials Collection
     const testimonialsList = [
       {
-        name: "Rohan S.",
-        initials: "RS",
+        name: "Nikhil Bare",
         rating: 5,
-        date: "3 weeks ago",
-        text: "Great clinic. Dedicated staff and doctor has excellent communication and soft skills.",
-        concern: "Acne",
+        date: "5 months ago",
+        text: "Skin problem ke liye aaya tha, doctor ne properly explain kiya. Treatment se improvement dikh raha hai. Staff bhi helpful aahe.",
+        treatment: "Skin Treatment",
+        sub: "Local Guide · 3 reviews · 41 photos",
+        ownerReply: "Thank you for your feedback"
       },
       {
-        name: "Priya M.",
-        initials: "PM",
+        name: "Abhay Yadav",
         rating: 5,
-        date: "1 month ago",
-        text: "Very accurate diagnosis, clear explanation and effective treatment. Highly satisfied.",
-        concern: "Pigmentation",
+        date: "4 months ago",
+        text: "Mujhe skin problem thi long time se, Aandi clinic me treatment liya. Ab skin thodi glow kar rahi hai. Perfect nahi but improvement hai. Thank you doctor",
+        treatment: "Skin Treatment",
+        sub: "1 review"
       },
       {
-        name: "Aditya K.",
-        initials: "AK",
+        name: "Reshma",
         rating: 5,
-        date: "2 months ago",
-        text: "Highly recommended place for skin problems. Saw real improvement within weeks.",
-        concern: "Hair Fall",
+        date: "5 months ago",
+        text: "Clinic thoda crowded asto, but waiting ke baad proper consultation milta hai. Doctor patiently sunte hai.",
+        treatment: "Consultation",
+        sub: "1 review",
+        ownerReply: "Thank you Reshma for your review. Sorry for the waiting time."
       },
       {
-        name: "Sneha P.",
-        initials: "SP",
+        name: "Sakshi Patil",
         rating: 5,
-        date: "2 months ago",
-        text: "Dr. Jain is patient, thorough and never pushes unnecessary procedures. Felt safe and informed.",
-        concern: "Melasma",
+        date: "a year ago",
+        text: "I had been struggling with acne for years and tried several remedies with little success. A friend recommended Anandi Skin & Hair Clinic, and I’m so glad I went! The dermatologist was very thorough and explained everything in detail.",
+        treatment: "Acne Care",
+        sub: "1 review",
+        ownerReply: "Thank you so much Sakshi for your feedback"
       },
+      {
+        name: "Kaushal Patil",
+        rating: 5,
+        date: "a year ago",
+        text: "I recently visited Anandi Skin & Hair Clinic for a skin and hair consultation, and I couldn't be more satisfied with the experience. The staff was incredibly welcoming, and the clinic maintained top-notch hygiene standards.",
+        treatment: "Skin & Hair Consultation",
+        sub: "1 review",
+        ownerReply: "Thank you for your valuable feedback"
+      },
+      {
+        name: "Shubham Pawar",
+        rating: 5,
+        date: "5 months ago",
+        text: "I had severe allergy on whole body . Got great results instantly. Dr explained everything well",
+        treatment: "Skin Allergy",
+        sub: "1 review",
+        ownerReply: "Thank you for your feedback"
+      },
+      {
+        name: "Yashwant More",
+        rating: 5,
+        date: "a year ago",
+        text: "I've visited the clinic i went for acne scars and oily skin dr vishakha properly checked my skin and started the procedure then explained everything that how I'm going to get rid of it",
+        treatment: "Acne Scars & Oily Skin",
+        sub: "2 reviews",
+        ownerReply: "Thank you for your valuable feedback"
+      },
+      {
+        name: "Sneha Patil",
+        rating: 5,
+        date: "a year ago",
+        text: "I recently visited Anandi Skin & Hair Clinic for a skin and hair consultation, and I couldn't be more satisfied with the experience. The staff was incredibly welcoming, and the clinic maintained top-notch hygiene standards",
+        treatment: "Skin & Hair Consultation",
+        sub: "1 review",
+        ownerReply: "Thank you Sneha for you valuable feedback. Do visit again for your quaterly hydrafacial"
+      },
+      {
+        name: "Dr. Suleman Mulla",
+        rating: 5,
+        date: "a year ago",
+        text: "Best and well experienced Dermatologist in Area.. must visit 😊👍🏻",
+        treatment: "Consultation",
+        sub: "11 reviews · 2 photos",
+        ownerReply: "Thank you for your valuable feedback"
+      },
+      {
+        name: "Sagar Sasane",
+        rating: 5,
+        date: "a month ago",
+        text: "Good treatment for skin related",
+        treatment: "Skin Care",
+        sub: "9 reviews · 8 photos"
+      },
+      {
+        name: "Sohel Shaikh",
+        rating: 5,
+        date: "4 months ago",
+        text: "Aandi hair and skin clinic khup chan ahe. Me hair fall sathi gelo hoto, 2 mahinyat farak disla. Doctor calm aahet ani proper explain kartat",
+        treatment: "Hair Fall Treatment",
+        sub: "3 reviews",
+        ownerReply: "Thank you for your valuable feedback"
+      },
+      {
+        name: "Vishal Kusale",
+        rating: 5,
+        date: "4 months ago",
+        text: "Aandi clinic cha experience changla hota. Doctor khup friendly aahet. Hindi aur Marathi dono me samjha dete hai, isliye tension nahi hota.",
+        treatment: "Consultation",
+        sub: "3 reviews",
+        ownerReply: "Thank you for the feedback"
+      },
+      {
+        name: "Shrutika Dhone",
+        rating: 5,
+        date: "4 months ago",
+        text: "Best clinic for hair treatment. I have dandruff problem, please consult me. Medicine is regular and results are good. It takes patience but it is worth it.",
+        treatment: "Dandruff Treatment",
+        sub: "3 reviews",
+        ownerReply: "Thanks Shrutika for your valuable feedback"
+      },
+      {
+        name: "KRISHNA DABHADE",
+        rating: 5,
+        date: "4 months ago",
+        text: "Doctor khup patiently sagla explain kartat. Majha acne problem khup kami zala aahe ata. Thank you Anandi clinic.",
+        treatment: "Acne Care",
+        sub: "Local Guide · 7 reviews · 9 photos",
+        ownerReply: "Thank you Krishna for your feedback"
+      },
+      {
+        name: "veeresh birajdar",
+        rating: 5,
+        date: "5 months ago",
+        text: "Mala skin allergy sathi treatmnt ghetla, itching khup kami zali. Overall satisfied aahe",
+        treatment: "Skin Allergy",
+        sub: "2 reviews · 7 photos",
+        ownerReply: "Thanks for your valuable feedback"
+      },
+      {
+        name: "Pratik Jadhav",
+        rating: 5,
+        date: "a year ago",
+        text: "My hair was thick and thin, I used to lose my hair constantly, I went to the clinic and I am getting my treatment as per the information given by Dr. Vishakha. Now my hair loss has completely disappeared, the fear of baldness that I had is gone.",
+        treatment: "Hair Loss Treatment",
+        sub: "2 reviews",
+        ownerReply: "feedback dilya baddal Thank you pratik"
+      },
+      {
+        name: "Rushikesh Ragde",
+        rating: 5,
+        date: "5 months ago",
+        text: "Very professional clinic. Great experience with the staff and dermatologist.",
+        treatment: "Skin Care",
+        sub: "1 review · 1 photo"
+      }
     ];
 
     for (const t of testimonialsList) {
@@ -373,19 +505,19 @@ export async function seedClinicDatabase() {
       {
         beforeSrc: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=900&q=70",
         afterSrc: "https://images.unsplash.com/photo-1556228852-80b6e5eeff06?w=900&q=70",
-        category: "Before & After",
+        category: "Patient Photos",
         caption: "Acne Control Therapy"
       },
       {
         beforeSrc: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=900&q=70",
         afterSrc: "https://images.unsplash.com/photo-1614109800763-7b46d0a9ad44?w=900&q=70",
-        category: "Before & After",
+        category: "Patient Photos",
         caption: "Pigmentation & Tone Laser"
       },
       {
         beforeSrc: "https://images.unsplash.com/photo-1559599101-f09722fb4948?w=900&q=70",
         afterSrc: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=900&q=70",
-        category: "Before & After",
+        category: "Patient Photos",
         caption: "PRP Hair Density Therapy"
       }
     ];
@@ -437,6 +569,105 @@ export async function seedClinicDatabase() {
     // 13. Chatbot Rules Collection
     for (const rule of defaultChatbotRules) {
       await addDoc(collection(db, "chatbotRules"), rule);
+    }
+
+    // 14. Appointments Seeding (Mock Data for Dashboard)
+    const appointmentsSnap = await getDocs(collection(db, "appointments"));
+    if (appointmentsSnap.empty) {
+      console.log("[Firebase Seeding] Seeding mock appointments...");
+      const mockAppointments = [
+        {
+          name: "Rahul Sharma",
+          phone: "9876543210",
+          email: "rahul@example.com",
+          service: "Acne Treatment",
+          preferredDate: "2026-07-06",
+          message: "Would like to consult for severe acne scars.",
+          createdAt: "2026-07-01T10:00:00.000Z",
+          status: "Confirmed",
+          price: 1500
+        },
+        {
+          name: "Neha Gupta",
+          phone: "9812345678",
+          email: "neha@example.com",
+          service: "Hydra Facial",
+          preferredDate: "2026-07-07",
+          message: "Routine facial treatment.",
+          createdAt: "2026-07-01T14:30:00.000Z",
+          status: "Pending",
+          price: 2500
+        },
+        {
+          name: "Anil Patel",
+          phone: "9765432109",
+          email: "anil@example.com",
+          service: "Hair Fall Treatment",
+          preferredDate: "2026-07-08",
+          message: "Consultation for thinning hair.",
+          createdAt: "2026-07-02T09:15:00.000Z",
+          status: "Confirmed",
+          price: 500
+        },
+        {
+          name: "Snehal Shinde",
+          phone: "9543210987",
+          email: "snehal@example.com",
+          service: "Chemical Peel",
+          preferredDate: "2026-07-06",
+          message: "Pigmentation issues.",
+          createdAt: "2026-06-30T11:00:00.000Z",
+          status: "Confirmed",
+          price: 2000
+        },
+        {
+          name: "Pratik Deshmukh",
+          phone: "9123456789",
+          email: "pratik@example.com",
+          service: "PRP Therapy",
+          preferredDate: "2026-07-09",
+          message: "Third session of PRP.",
+          createdAt: "2026-06-29T16:20:00.000Z",
+          status: "Confirmed",
+          price: 3500
+        },
+        {
+          name: "Pooja Joshi",
+          phone: "9871234560",
+          email: "pooja@example.com",
+          service: "Laser Hair Removal",
+          preferredDate: "2026-07-10",
+          message: "Underarm session.",
+          createdAt: "2026-07-02T12:00:00.000Z",
+          status: "Pending",
+          price: 4000
+        },
+        {
+          name: "Aditya Kulkarni",
+          phone: "9988776655",
+          email: "aditya@example.com",
+          service: "Vitiligo",
+          preferredDate: "2026-07-11",
+          message: "White patches consulting.",
+          createdAt: "2026-06-28T10:40:00.000Z",
+          status: "Confirmed",
+          price: 1000
+        },
+        {
+          name: "Komal More",
+          phone: "9001122334",
+          email: "komal@example.com",
+          service: "Melasma",
+          preferredDate: "2026-07-08",
+          message: "Severe pigmentation on cheeks.",
+          createdAt: "2026-06-30T15:00:00.000Z",
+          status: "Pending",
+          price: 1800
+        }
+      ];
+      for (const app of mockAppointments) {
+        await addDoc(collection(db, "appointments"), app);
+      }
     }
 
     console.log("[Firebase Seeding] All collections successfully seeded to Firestore!");

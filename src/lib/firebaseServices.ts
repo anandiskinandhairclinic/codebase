@@ -212,14 +212,23 @@ export async function getFAQs() {
 export async function createAppointment(data: {
   name: string;
   phone: string;
-  email: string;
+  email?: string;
   service: string;
   preferredDate: string;
-  message: string;
+  message?: string;
+  status?: string;
 }) {
   try {
+    const cleanedData: any = {};
+    Object.entries(data).forEach(([key, val]) => {
+      if (val !== undefined && val !== null) {
+        cleanedData[key] = val;
+      }
+    });
+
     const docRef = await addDoc(collection(db, "appointments"), {
-      ...data,
+      ...cleanedData,
+      status: data.status || "Pending",
       createdAt: new Date().toISOString(),
     });
 
@@ -346,7 +355,7 @@ export async function getBeforeAfterItems() {
       const items: any[] = [];
       querySnap.forEach((d) => {
         const data = d.data();
-        if (data.category === "Before & After" || (data.beforeSrc && data.afterSrc)) {
+        if (data.category === "Before & After" || data.category === "Patient Photos" || (data.beforeSrc && data.afterSrc)) {
           items.push({ id: d.id, ...data });
         }
       });
@@ -366,8 +375,15 @@ export async function createOrder(data: {
   total: number;
 }) {
   try {
+    const cleanedData: any = {};
+    Object.entries(data).forEach(([key, val]) => {
+      if (val !== undefined && val !== null) {
+        cleanedData[key] = val;
+      }
+    });
+
     const docRef = await addDoc(collection(db, "orders"), {
-      ...data,
+      ...cleanedData,
       status: "Pending",
       createdAt: new Date().toISOString(),
     });
@@ -380,16 +396,28 @@ export async function createOrder(data: {
 
 // 16. Generic CRUD Write Helpers
 export async function addDocToCollection(colName: string, data: any) {
+  const cleaned: any = {};
+  Object.entries(data).forEach(([k, v]) => {
+    if (v !== undefined && v !== null) {
+      cleaned[k] = v;
+    }
+  });
   const docRef = await addDoc(collection(db, colName), {
-    ...data,
+    ...cleaned,
     createdAt: new Date().toISOString(),
   });
   return docRef.id;
 }
 
 export async function updateDocInCollection(colName: string, id: string, data: any) {
+  const cleaned: any = {};
+  Object.entries(data).forEach(([k, v]) => {
+    if (v !== undefined && v !== null) {
+      cleaned[k] = v;
+    }
+  });
   const docRef = doc(db, colName, id);
-  await updateDoc(docRef, data);
+  await updateDoc(docRef, cleaned);
 }
 
 export async function deleteDocFromCollection(colName: string, id: string) {
@@ -413,6 +441,96 @@ export async function getChatbotRules() {
     }
     return [];
   }, []);
+}
+
+// 18. Get Dashboard Data
+export async function getDashboardData() {
+  return safeQuery(async () => {
+    const [apptsSnap, productsSnap, blogsSnap, testimonialsSnap, ordersSnap] = await Promise.all([
+      getDocs(collection(db, "appointments")),
+      getDocs(collection(db, "products")),
+      getDocs(collection(db, "blogs")),
+      getDocs(collection(db, "testimonials")),
+      getDocs(collection(db, "orders")),
+    ]);
+
+    const appointmentsCount = apptsSnap.size;
+    const productsCount = productsSnap.size;
+    const blogsCount = blogsSnap.size;
+    const testimonialsCount = testimonialsSnap.size;
+    const ordersCount = ordersSnap.size;
+
+    // Group appointments by day of week for the past 7 days (Mon-Sun)
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const apptsByDay: Record<string, number> = { Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0, Sun: 0 };
+    const ordersByDay: Record<string, number> = { Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0, Sun: 0 };
+
+    let pendingCount = 0;
+    let confirmedCount = 0;
+    let estimatedRevenue = 0;
+
+    apptsSnap.forEach(d => {
+      const data = d.data();
+      const status = data.status || "Pending";
+      if (status === "Confirmed") {
+        confirmedCount++;
+        estimatedRevenue += Number(data.price) || 500;
+      } else {
+        pendingCount++;
+      }
+      
+      const dateStr = data.createdAt || data.preferredDate;
+      if (dateStr) {
+        const date = new Date(dateStr);
+        const dayName = days[date.getDay()];
+        if (apptsByDay[dayName] !== undefined) {
+          apptsByDay[dayName]++;
+        }
+      }
+    });
+
+    ordersSnap.forEach(d => {
+      const data = d.data();
+      estimatedRevenue += Number(data.total) || 0;
+      
+      const dateStr = data.createdAt;
+      if (dateStr) {
+        const date = new Date(dateStr);
+        const dayName = days[date.getDay()];
+        if (ordersByDay[dayName] !== undefined) {
+          ordersByDay[dayName]++;
+        }
+      }
+    });
+
+    const orderOfDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const apptChart = orderOfDays.map(d => ({ d, v: apptsByDay[d] }));
+    const orderChart = orderOfDays.map(d => ({ d, v: ordersByDay[d] }));
+
+    return {
+      appointmentsCount,
+      productsCount,
+      blogsCount,
+      testimonialsCount,
+      ordersCount,
+      pendingCount,
+      confirmedCount,
+      estimatedRevenue,
+      apptChart,
+      orderChart,
+    };
+  }, {
+    appointmentsCount: 0,
+    productsCount: 0,
+    blogsCount: 0,
+    testimonialsCount: 0,
+    ordersCount: 0,
+    pendingCount: 0,
+    confirmedCount: 0,
+    estimatedRevenue: 0,
+    apptChart: [],
+    orderChart: [],
+  });
 }
 
 

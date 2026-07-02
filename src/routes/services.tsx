@@ -78,7 +78,7 @@ function Services() {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filtered.map((t, idx) => {
-                const treatmentImg = t.image || t.imageUrl || "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=70";
+                const treatmentImg = t.image || t.imageUrl || "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=70";
                 return (
                   <motion.div
                     key={t.slug}

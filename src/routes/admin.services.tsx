@@ -36,8 +36,8 @@ function AdminServices() {
   const [symptoms, setSymptoms] = useState("");
   const [causes, setCauses] = useState("");
   const [benefits, setBenefits] = useState("");
-  const [processSteps, setProcessSteps] = useState("");
-  const [faqsText, setFaqsText] = useState("");
+  const [processList, setProcessList] = useState<{ step: string; detail: string }[]>([]);
+  const [faqList, setFaqList] = useState<{ q: string; a: string }[]>([]);
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -66,8 +66,8 @@ function AdminServices() {
     setSymptoms("");
     setCauses("");
     setBenefits("");
-    setProcessSteps("");
-    setFaqsText("");
+    setProcessList([]);
+    setFaqList([]);
     setIsOpen(true);
   };
 
@@ -86,15 +86,8 @@ function AdminServices() {
     setCauses(t.causes ? t.causes.join("\n") : "");
     setBenefits(t.benefits ? t.benefits.join("\n") : "");
     
-    const formattedProcess = t.process 
-      ? t.process.map(p => `${p.step}|${p.detail}`).join("\n") 
-      : "";
-    setProcessSteps(formattedProcess);
-
-    const formattedFaqs = t.faqs
-      ? t.faqs.map(f => `${f.q}|${f.a}`).join("\n")
-      : "";
-    setFaqsText(formattedFaqs);
+    setProcessList(t.process || []);
+    setFaqList(t.faqs || []);
 
     setIsOpen(true);
   };
@@ -126,21 +119,8 @@ function AdminServices() {
       const causesList = causes.split("\n").map(c => c.trim()).filter(Boolean);
       const benefitsList = benefits.split("\n").map(b => b.trim()).filter(Boolean);
       
-      const processList = processSteps.split("\n").map(line => {
-        const parts = line.split("|");
-        return {
-          step: parts[0]?.trim() || "",
-          detail: parts[1]?.trim() || "",
-        };
-      }).filter(p => p.step || p.detail);
-
-      const faqList = faqsText.split("\n").map(line => {
-        const parts = line.split("|");
-        return {
-          q: parts[0]?.trim() || "",
-          a: parts[1]?.trim() || "",
-        };
-      }).filter(f => f.q || f.a);
+      const filteredProcess = processList.filter(p => p.step.trim() || p.detail.trim());
+      const filteredFaqs = faqList.filter(f => f.q.trim() || f.a.trim());
 
       const data = {
         slug: activeSlug,
@@ -156,8 +136,8 @@ function AdminServices() {
         symptoms: symptomsList,
         causes: causesList,
         benefits: benefitsList,
-        process: processList,
-        faqs: faqList,
+        process: filteredProcess,
+        faqs: filteredFaqs,
       };
 
       await updateSingleDoc("services", activeSlug, data);
@@ -279,14 +259,14 @@ function AdminServices() {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="srv-blurb">Short Blurb</Label>
+              <Label htmlFor="srv-blurb">Tag Line</Label>
               <textarea
                 id="srv-blurb"
                 rows={2}
                 value={blurb}
                 onChange={e => setBlurb(e.target.value)}
                 className="w-full text-sm rounded-xl border border-border p-3 focus-visible:outline-none"
-                placeholder="Brief summary..."
+                placeholder="Brief tag line summary..."
                 required
               />
             </div>
@@ -340,28 +320,120 @@ function AdminServices() {
               />
             </div>
 
-            <div className="space-y-1">
-              <Label htmlFor="srv-process">Treatment Pathway Steps (Format: Title | Detail - one per line)</Label>
-              <textarea
-                id="srv-process"
-                rows={3}
-                value={processSteps}
-                onChange={e => setProcessSteps(e.target.value)}
-                className="w-full text-xs rounded-xl border border-border p-3 focus-visible:outline-none"
-                placeholder="Step 1: Consultation | Visual assessment&#10;Step 2: Peel | Gentle glycolic peel application"
-              />
+            <div className="space-y-2 border-t border-[#ecdcc9]/25 pt-4">
+              <div className="flex justify-between items-center">
+                <Label className="text-sm font-semibold text-[#5c4a37]">Treatment Pathway Steps</Label>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setProcessList([...processList, { step: "", detail: "" }])}
+                  className="rounded-full text-xs"
+                >
+                  + Add Step
+                </Button>
+              </div>
+              <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
+                {processList.map((item, idx) => (
+                  <div key={idx} className="flex gap-2 items-start bg-muted/40 p-2.5 rounded-xl border border-border">
+                    <div className="flex-1 space-y-2">
+                      <Input 
+                        placeholder={`Step ${idx + 1} Title`} 
+                        value={item.step} 
+                        onChange={e => {
+                          const newList = [...processList];
+                          newList[idx].step = e.target.value;
+                          setProcessList(newList);
+                        }} 
+                        className="h-8 text-xs rounded-lg"
+                        required
+                      />
+                      <textarea 
+                        placeholder="Step detail description..." 
+                        rows={2}
+                        value={item.detail} 
+                        onChange={e => {
+                          const newList = [...processList];
+                          newList[idx].detail = e.target.value;
+                          setProcessList(newList);
+                        }} 
+                        className="w-full text-xs rounded-lg border border-border p-2 focus-visible:outline-none"
+                        required
+                      />
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => setProcessList(processList.filter((_, i) => i !== idx))} 
+                      className="size-7 rounded-lg hover:bg-red-50 text-red-500 flex items-center justify-center border border-transparent hover:border-red-200 transition-colors mt-0.5 text-lg font-bold"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+                {processList.length === 0 && (
+                  <p className="text-[11px] text-muted-foreground text-center py-4 bg-muted/20 rounded-xl border border-dashed">
+                    No steps added. Click "+ Add Step" to build the pathway.
+                  </p>
+                )}
+              </div>
             </div>
 
-            <div className="space-y-1">
-              <Label htmlFor="srv-faqs">Frequently Asked Questions (Format: Question | Answer - one per line)</Label>
-              <textarea
-                id="srv-faqs"
-                rows={3}
-                value={faqsText}
-                onChange={e => setFaqsText(e.target.value)}
-                className="w-full text-xs rounded-xl border border-border p-3 focus-visible:outline-none"
-                placeholder="Is it painful? | Mild tingling during procedure&#10;How many sessions? | 4-6 sessions recommended"
-              />
+            <div className="space-y-2 border-t border-[#ecdcc9]/25 pt-4">
+              <div className="flex justify-between items-center">
+                <Label className="text-sm font-semibold text-[#5c4a37]">Frequently Asked Questions</Label>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setFaqList([...faqList, { q: "", a: "" }])}
+                  className="rounded-full text-xs"
+                >
+                  + Add FAQ
+                </Button>
+              </div>
+              <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
+                {faqList.map((item, idx) => (
+                  <div key={idx} className="flex gap-2 items-start bg-muted/40 p-2.5 rounded-xl border border-border">
+                    <div className="flex-1 space-y-2">
+                      <Input 
+                        placeholder="Question text..." 
+                        value={item.q} 
+                        onChange={e => {
+                          const newList = [...faqList];
+                          newList[idx].q = e.target.value;
+                          setFaqList(newList);
+                        }} 
+                        className="h-8 text-xs rounded-lg"
+                        required
+                      />
+                      <textarea 
+                        placeholder="Answer details..." 
+                        rows={2}
+                        value={item.a} 
+                        onChange={e => {
+                          const newList = [...faqList];
+                          newList[idx].a = e.target.value;
+                          setFaqList(newList);
+                        }} 
+                        className="w-full text-xs rounded-lg border border-border p-2 focus-visible:outline-none"
+                        required
+                      />
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => setFaqList(faqList.filter((_, i) => i !== idx))} 
+                      className="size-7 rounded-lg hover:bg-red-50 text-red-500 flex items-center justify-center border border-transparent hover:border-red-200 transition-colors mt-0.5 text-lg font-bold"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+                {faqList.length === 0 && (
+                  <p className="text-[11px] text-muted-foreground text-center py-4 bg-muted/20 rounded-xl border border-dashed">
+                    No FAQs added. Click "+ Add FAQ" to add questions.
+                  </p>
+                )}
+              </div>
             </div>
 
             <DialogFooter className="pt-2">

@@ -169,7 +169,17 @@ function AdminProducts() {
               </div>
               <div className="space-y-1">
                 <Label htmlFor="prod-cat">Category</Label>
-                <Input id="prod-cat" value={category} onChange={e => setCategory(e.target.value)} placeholder="e.g. Serums" required />
+                <select
+                  id="prod-cat"
+                  value={category}
+                  onChange={e => setCategory(e.target.value)}
+                  className="w-full text-sm rounded-full bg-muted/60 px-4 py-2.5 focus:outline-none border border-input"
+                  required
+                >
+                  {["Cleansers", "Moisturizers", "Serums", "Sunscreen", "Hair Care", "Kits"].map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -180,11 +190,29 @@ function AdminProducts() {
               </div>
               <div className="space-y-1">
                 <Label htmlFor="prod-skin">Skin Target</Label>
-                <Input id="prod-skin" value={skin} onChange={e => setSkin(e.target.value)} placeholder="e.g. Oily / All" />
+                <select
+                  id="prod-skin"
+                  value={skin}
+                  onChange={e => setSkin(e.target.value)}
+                  className="w-full text-sm rounded-full bg-muted/60 px-4 py-2.5 focus:outline-none border border-input"
+                >
+                  {["All", "Oily", "Dry", "Sensitive", "Acne-Prone", "Pigmentation", "None"].map(s => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-1">
                 <Label htmlFor="prod-hair">Hair Target</Label>
-                <Input id="prod-hair" value={hair} onChange={e => setHair(e.target.value)} placeholder="e.g. Thinning" />
+                <select
+                  id="prod-hair"
+                  value={hair}
+                  onChange={e => setHair(e.target.value)}
+                  className="w-full text-sm rounded-full bg-muted/60 px-4 py-2.5 focus:outline-none border border-input"
+                >
+                  {["All", "Thinning / Hair Loss", "Dandruff-Prone", "Dry / Damaged", "None"].map(h => (
+                    <option key={h} value={h}>{h}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -197,13 +225,14 @@ function AdminProducts() {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="prod-blurb">Short Blurb</Label>
+              <Label htmlFor="prod-blurb">Tag Line</Label>
               <textarea
                 id="prod-blurb"
                 rows={2}
                 value={blurb}
                 onChange={e => setBlurb(e.target.value)}
                 className="w-full text-sm rounded-xl border border-border p-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
+                placeholder="Brief tag line summary..."
                 required
               />
             </div>

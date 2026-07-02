@@ -280,15 +280,6 @@ function Home() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {testimonials.slice(0, 6).map((t, i) => {
-                const reviewsMetadata = [
-                  { sub: "Local Guide · 18 reviews", date: "3 days ago" },
-                  { sub: "2 reviews", date: "1 week ago" },
-                  { sub: "Local Guide · 32 reviews · 8 photos", date: "2 weeks ago" },
-                  { sub: "5 reviews", date: "3 weeks ago" },
-                  { sub: "Local Guide · 12 reviews", date: "1 month ago" },
-                  { sub: "4 reviews", date: "1 month ago" },
-                ];
-                const meta = reviewsMetadata[i % reviewsMetadata.length];
                 return (
                   <motion.figure
                     key={i}
@@ -306,22 +297,31 @@ function Home() {
                       />
                     </svg>
                     
-                    <div className="space-y-4">
-                      {/* Stars and verified */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex gap-0.5">
-                          {[...Array(t.rating)].map((_, idx) => (
-                            <Star key={idx} className="size-4 fill-[#fbbc05] text-[#fbbc05]" />
-                          ))}
+                    <div className="space-y-4 flex-1 flex flex-col justify-between mb-6">
+                      <div className="space-y-4">
+                        {/* Stars and verified */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex gap-0.5">
+                            {[...Array(t.rating)].map((_, idx) => (
+                              <Star key={idx} className="size-4 fill-[#fbbc05] text-[#fbbc05]" />
+                            ))}
+                          </div>
+                          <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 border border-emerald-200/50 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                            <CheckCircle className="size-3" /> Verified Google Review
+                          </span>
                         </div>
-                        <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 border border-emerald-200/50 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                          <CheckCircle className="size-3" /> Verified Google Review
-                        </span>
+
+                        <blockquote className="text-sm font-medium italic text-[#5c4a37] leading-relaxed">
+                          "{t.quote}"
+                        </blockquote>
                       </div>
 
-                      <blockquote className="text-sm font-medium italic text-[#5c4a37] leading-relaxed">
-                        "{t.quote}"
-                      </blockquote>
+                      {t.ownerReply && (
+                        <div className="mt-3 p-3 bg-[#faf6f0] border border-[#ecdcc9]/40 rounded-2xl text-[10px] text-[#8a7560] leading-relaxed">
+                          <span className="font-bold block text-[#5c4a37] mb-0.5">Anandi Clinic (owner):</span>
+                          "{t.ownerReply}"
+                        </div>
+                      )}
                     </div>
 
                     <figcaption className="mt-6 flex items-center gap-3 pt-4 border-t border-[#ecdcc9]/30">
@@ -336,9 +336,9 @@ function Home() {
                           </span>
                         </div>
                         <div className="text-[10px] text-muted-foreground flex flex-wrap items-center gap-1 mt-0.5">
-                          <span>{meta.sub}</span>
+                          <span>{t.sub || "1 review"}</span>
                           <span>·</span>
-                          <span>{meta.date}</span>
+                          <span>{t.date || "1 month ago"}</span>
                         </div>
                         <div className="text-[9px] text-[#8a7560] font-medium mt-1">
                           Treatment: {t.treatment}

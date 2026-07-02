@@ -31,7 +31,6 @@ import { Route as AdminGalleryRouteImport } from './routes/admin.gallery'
 import { Route as AdminDoctorsRouteImport } from './routes/admin.doctors'
 import { Route as AdminChatbotRouteImport } from './routes/admin.chatbot'
 import { Route as AdminBlogRouteImport } from './routes/admin.blog'
-import { Route as AdminBeforeAfterRouteImport } from './routes/admin.before-after'
 import { Route as AdminAppointmentsRouteImport } from './routes/admin.appointments'
 
 const TestimonialsRoute = TestimonialsRouteImport.update({
@@ -144,11 +143,6 @@ const AdminBlogRoute = AdminBlogRouteImport.update({
   path: '/blog',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminBeforeAfterRoute = AdminBeforeAfterRouteImport.update({
-  id: '/before-after',
-  path: '/before-after',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminAppointmentsRoute = AdminAppointmentsRouteImport.update({
   id: '/appointments',
   path: '/appointments',
@@ -167,7 +161,6 @@ export interface FileRoutesByFullPath {
   '/services': typeof ServicesRoute
   '/testimonials': typeof TestimonialsRoute
   '/admin/appointments': typeof AdminAppointmentsRoute
-  '/admin/before-after': typeof AdminBeforeAfterRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/chatbot': typeof AdminChatbotRoute
   '/admin/doctors': typeof AdminDoctorsRoute
@@ -192,7 +185,6 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesRoute
   '/testimonials': typeof TestimonialsRoute
   '/admin/appointments': typeof AdminAppointmentsRoute
-  '/admin/before-after': typeof AdminBeforeAfterRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/chatbot': typeof AdminChatbotRoute
   '/admin/doctors': typeof AdminDoctorsRoute
@@ -219,7 +211,6 @@ export interface FileRoutesById {
   '/services': typeof ServicesRoute
   '/testimonials': typeof TestimonialsRoute
   '/admin/appointments': typeof AdminAppointmentsRoute
-  '/admin/before-after': typeof AdminBeforeAfterRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/chatbot': typeof AdminChatbotRoute
   '/admin/doctors': typeof AdminDoctorsRoute
@@ -247,7 +238,6 @@ export interface FileRouteTypes {
     | '/services'
     | '/testimonials'
     | '/admin/appointments'
-    | '/admin/before-after'
     | '/admin/blog'
     | '/admin/chatbot'
     | '/admin/doctors'
@@ -272,7 +262,6 @@ export interface FileRouteTypes {
     | '/services'
     | '/testimonials'
     | '/admin/appointments'
-    | '/admin/before-after'
     | '/admin/blog'
     | '/admin/chatbot'
     | '/admin/doctors'
@@ -298,7 +287,6 @@ export interface FileRouteTypes {
     | '/services'
     | '/testimonials'
     | '/admin/appointments'
-    | '/admin/before-after'
     | '/admin/blog'
     | '/admin/chatbot'
     | '/admin/doctors'
@@ -485,13 +473,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBlogRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/before-after': {
-      id: '/admin/before-after'
-      path: '/before-after'
-      fullPath: '/admin/before-after'
-      preLoaderRoute: typeof AdminBeforeAfterRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/appointments': {
       id: '/admin/appointments'
       path: '/appointments'
@@ -504,7 +485,6 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAppointmentsRoute: typeof AdminAppointmentsRoute
-  AdminBeforeAfterRoute: typeof AdminBeforeAfterRoute
   AdminBlogRoute: typeof AdminBlogRoute
   AdminChatbotRoute: typeof AdminChatbotRoute
   AdminDoctorsRoute: typeof AdminDoctorsRoute
@@ -518,7 +498,6 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAppointmentsRoute: AdminAppointmentsRoute,
-  AdminBeforeAfterRoute: AdminBeforeAfterRoute,
   AdminBlogRoute: AdminBlogRoute,
   AdminChatbotRoute: AdminChatbotRoute,
   AdminDoctorsRoute: AdminDoctorsRoute,

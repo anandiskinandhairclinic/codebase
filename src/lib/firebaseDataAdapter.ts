@@ -30,11 +30,12 @@ import {
   deleteDocFromCollection,
   updateSingleDoc,
   getChatbotRules,
+  getDashboardData,
 } from "./firebaseServices";
 import { clinic, whatsappLink, telLink } from "./clinic";
 
 // Re-export unchanged backend functions
-export { createAppointment, whatsappLink, telLink, createOrder, addDocToCollection, updateDocInCollection, deleteDocFromCollection, updateSingleDoc, getServiceBySlug, getChatbotRules };
+export { createAppointment, whatsappLink, telLink, createOrder, addDocToCollection, updateDocInCollection, deleteDocFromCollection, updateSingleDoc, getServiceBySlug, getChatbotRules, getDashboardData };
 
 // ────────────────────────────────────────────
 // Types that the new frontend expects
@@ -62,6 +63,9 @@ export type Testimonial = {
   treatment: string;
   rating: number;
   quote: string;
+  date?: string;
+  sub?: string;
+  ownerReply?: string;
 };
 
 export type BlogPost = {
@@ -203,9 +207,12 @@ export async function getTestimonialsList(): Promise<Testimonial[]> {
   return rawTestimonials.map((t: any) => ({
     id: t.id,
     name: t.name || "Patient",
-    treatment: t.treatment || t.service || "General",
+    treatment: t.treatment || t.service || t.concern || "General",
     rating: t.rating || 5,
     quote: t.quote || t.text || t.review || "",
+    date: t.date || "1 month ago",
+    sub: t.sub || "1 review",
+    ownerReply: t.ownerReply || "",
   }));
 }
 

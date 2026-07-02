@@ -16,7 +16,6 @@ const nav: { to: string; label: string; icon: any; exact?: boolean }[] = [
   { to: "/admin/services", label: "Services", icon: Briefcase },
   { to: "/admin/blog", label: "Blog", icon: FileText },
   { to: "/admin/testimonials", label: "Testimonials", icon: MessageSquare },
-  { to: "/admin/before-after", label: "Before/After", icon: ImageIcon },
   { to: "/admin/chatbot", label: "Chatbot Rules", icon: Bot },
   { to: "/admin/doctors", label: "Doctors", icon: Stethoscope },
   { to: "/admin/gallery", label: "Gallery", icon: GalleryVertical },
