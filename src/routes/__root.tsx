@@ -93,9 +93,13 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
-        {!isAdmin && <Header />}
-        <Outlet />
-        {!isAdmin && <Footer />}
+        <div className="flex flex-col min-h-screen">
+          {!isAdmin && <Header />}
+          <div className="flex-1 flex-grow">
+            <Outlet />
+          </div>
+          {!isAdmin && <Footer />}
+        </div>
         {!isAdmin && <Chatbot />}
         {!isAdmin && <FloatingActions />}
         {!isAdmin && <CallbackPopup />}
