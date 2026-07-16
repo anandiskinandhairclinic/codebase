@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { CloudinaryUpload } from "@/components/ui/CloudinaryUpload";
+import { skinConcernsList, skinTypesList } from "@/components/site/Chatbot";
 
 export const Route = createFileRoute("/admin/products")({
   component: AdminProducts,
@@ -25,12 +26,11 @@ function AdminProducts() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
-  const [skin, setSkin] = useState("");
-  const [hair, setHair] = useState("");
   const [blurb, setBlurb] = useState("");
   const [benefits, setBenefits] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [selectedConcerns, setSelectedConcerns] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
   const fetchProducts = () => {
@@ -50,12 +50,11 @@ function AdminProducts() {
     setName("");
     setCategory("Moisturizers");
     setPrice("");
-    setSkin("All");
-    setHair("");
     setBlurb("");
     setBenefits("");
     setIngredients("");
     setImageUrl("");
+    setSelectedConcerns([]);
     setIsOpen(true);
   };
 
@@ -64,12 +63,11 @@ function AdminProducts() {
     setName(p.name);
     setCategory(p.category);
     setPrice(p.price.toString());
-    setSkin(p.skin || "All");
-    setHair(p.hair || "");
     setBlurb(p.blurb);
     setBenefits(p.benefits.join("\n"));
     setIngredients(p.ingredients.join("\n"));
     setImageUrl(p.imageUrl || "");
+    setSelectedConcerns(p.concerns || []);
     setIsOpen(true);
   };
 
@@ -93,12 +91,13 @@ function AdminProducts() {
         name,
         category,
         price: Number(price) || 0,
-        skin: skin || null,
-        hair: hair || null,
+        skin: null,
+        hair: null,
         blurb,
         benefits: benefits.split("\n").map(b => b.trim()).filter(Boolean),
         ingredients: ingredients.split("\n").map(i => i.trim()).filter(Boolean),
         imageUrl: imageUrl || null,
+        concerns: selectedConcerns,
       };
 
       if (editProduct) {
@@ -128,7 +127,7 @@ function AdminProducts() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[700px]">
               <thead className="bg-muted/60 text-left">
-                <tr>{["Product", "Category", "Skin/Hair", "Price", ""].map(h => <th key={h} className="px-5 py-3 font-medium text-muted-foreground">{h}</th>)}</tr>
+                <tr>{["Product", "Category", "Skin/Hair / Concerns", "Price", ""].map(h => <th key={h} className="px-5 py-3 font-medium text-muted-foreground">{h}</th>)}</tr>
               </thead>
               <tbody>
                 {products.map(p => (
@@ -138,7 +137,22 @@ function AdminProducts() {
                       <span className="font-medium">{p.name}</span>
                     </td>
                     <td className="px-5 py-3">{p.category}</td>
-                    <td className="px-5 py-3">{p.skin || p.hair || "—"}</td>
+                    <td className="px-5 py-3">
+                      <div className="flex flex-wrap gap-1 max-w-[250px]">
+                        {(p.skin && p.skin !== "None" && p.skin !== "All") && (
+                          <span className="text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded-full">{p.skin}</span>
+                        )}
+                        {(p.hair && p.hair !== "None" && p.hair !== "All") && (
+                          <span className="text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded-full">{p.hair}</span>
+                        )}
+                        {p.concerns?.map(c => (
+                          <span key={c} className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-semibold">
+                            {c}
+                          </span>
+                        ))}
+                        {!(p.skin && p.skin !== "None" && p.skin !== "All") && !(p.hair && p.hair !== "None" && p.hair !== "All") && (!p.concerns || p.concerns.length === 0) && "—"}
+                      </div>
+                    </td>
                     <td className="px-5 py-3">₹{p.price.toLocaleString()}</td>
                     <td className="px-5 py-3">
                       <div className="flex gap-1 justify-end">
@@ -162,7 +176,7 @@ function AdminProducts() {
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <Label htmlFor="prod-name">Product Name</Label>
                 <Input id="prod-name" value={name} onChange={e => setName(e.target.value)} required />
@@ -181,38 +195,9 @@ function AdminProducts() {
                   ))}
                 </select>
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <Label htmlFor="prod-price">Price (₹)</Label>
                 <Input id="prod-price" type="number" value={price} onChange={e => setPrice(e.target.value)} required />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="prod-skin">Skin Target</Label>
-                <select
-                  id="prod-skin"
-                  value={skin}
-                  onChange={e => setSkin(e.target.value)}
-                  className="w-full text-sm rounded-full bg-muted/60 px-4 py-2.5 focus:outline-none border border-input"
-                >
-                  {["All", "Oily", "Dry", "Sensitive", "Acne-Prone", "Pigmentation", "None"].map(s => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="prod-hair">Hair Target</Label>
-                <select
-                  id="prod-hair"
-                  value={hair}
-                  onChange={e => setHair(e.target.value)}
-                  className="w-full text-sm rounded-full bg-muted/60 px-4 py-2.5 focus:outline-none border border-input"
-                >
-                  {["All", "Thinning / Hair Loss", "Dandruff-Prone", "Dry / Damaged", "None"].map(h => (
-                    <option key={h} value={h}>{h}</option>
-                  ))}
-                </select>
               </div>
             </div>
 
@@ -222,6 +207,60 @@ function AdminProducts() {
                 value={imageUrl}
                 onUploadSuccess={(url) => setImageUrl(url)}
               />
+            </div>
+
+            <div className="space-y-3 border-t border-border pt-4">
+              <Label className="font-semibold text-xs text-[#5c4a37]">Chatbot Prescriptions</Label>
+              
+              <div className="flex flex-col gap-4">
+                {/* Column 1: Skin Types */}
+                <div className="space-y-2 bg-muted/30 p-3.5 rounded-2xl border border-border/50">
+                  <div className="text-[10px] font-bold text-[#5c4a37] uppercase tracking-wider mb-1">Skin Types</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                    {skinTypesList.map((type) => (
+                      <label key={type} className="flex items-center gap-2 text-xs font-medium cursor-pointer py-1">
+                        <input
+                          type="checkbox"
+                          checked={selectedConcerns.includes(type)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedConcerns([...selectedConcerns, type]);
+                            } else {
+                              setSelectedConcerns(selectedConcerns.filter((c) => c !== type));
+                            }
+                          }}
+                          className="rounded border-gray-300 text-primary focus:ring-primary size-4 cursor-pointer"
+                        />
+                        <span className="text-foreground/80">{type}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Column 2: Skin Concerns */}
+                <div className="space-y-2 bg-muted/30 p-3.5 rounded-2xl border border-border/50">
+                  <div className="text-[10px] font-bold text-[#5c4a37] uppercase tracking-wider mb-1">Skin Concerns</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 max-h-[160px] overflow-y-auto pr-1">
+                    {skinConcernsList.map((concern) => (
+                      <label key={concern} className="flex items-center gap-2 text-xs font-medium cursor-pointer py-1">
+                        <input
+                          type="checkbox"
+                          checked={selectedConcerns.includes(concern)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedConcerns([...selectedConcerns, concern]);
+                            } else {
+                              setSelectedConcerns(selectedConcerns.filter((c) => c !== concern));
+                            }
+                          }}
+                          className="rounded border-gray-300 text-primary focus:ring-primary size-4 cursor-pointer"
+                        />
+                        <span className="text-foreground/80">{concern}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-1">

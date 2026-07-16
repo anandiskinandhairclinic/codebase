@@ -11,35 +11,26 @@ export async function seedClinicDatabase() {
       // Self-healing check: check if we have all services in the services collection
       try {
         const servicesSnap = await getDocs(collection(db, "services"));
-        let needsSeeding = servicesSnap.size !== fallbackServices.length;
-        if (!needsSeeding) {
-          servicesSnap.forEach((doc) => {
-            const data = doc.data();
-            if (!data.overview || !data.symptoms || !data.causes || !data.process || !data.benefits || !data.faqs) {
-              needsSeeding = true;
-            }
-          });
-        }
-        if (needsSeeding) {
-          console.log("[Firebase Seeding] Services count mismatch or incomplete. Wiping services collection and seeding fresh...");
-          for (const d of servicesSnap.docs) {
-            await deleteDoc(d.ref);
-          }
+        if (servicesSnap.empty) {
+          console.log("[Firebase Seeding] Services collection is empty. Seeding services...");
           for (const service of fallbackServices) {
             await setDoc(doc(db, "services", service.slug), service);
           }
-          console.log("[Firebase Seeding] Successfully seeded 73 services details!");
+          console.log("[Firebase Seeding] Successfully seeded default services details!");
         } else {
-          console.log("[Firebase Seeding] Healing existing service cover images...");
+          // Check if any fallback services are missing in Firestore and add only those.
+          // Never wipe the collection or overwrite existing service data/images.
+          const existingSlugs = new Set(servicesSnap.docs.map(d => d.id));
+          let seededMissingCount = 0;
           for (const service of fallbackServices) {
-            if (service.imageUrl) {
-              await setDoc(doc(db, "services", service.slug), {
-                image: service.imageUrl,
-                imageUrl: service.imageUrl
-              }, { merge: true });
+            if (!existingSlugs.has(service.slug)) {
+              await setDoc(doc(db, "services", service.slug), service);
+              seededMissingCount++;
             }
           }
-          console.log("[Firebase Seeding] Curated service cover images successfully healed in Firestore!");
+          if (seededMissingCount > 0) {
+            console.log(`[Firebase Seeding] Seeded ${seededMissingCount} missing services.`);
+          }
         }
       } catch (err) {
         console.warn("[Firebase Seeding] Could not auto-seed missing services:", err);
@@ -53,7 +44,21 @@ export async function seedClinicDatabase() {
           for (const product of fallbackProducts) {
             await setDoc(doc(db, "products", product.id), product);
           }
-          console.log("[Firebase Seeding] Successfully seeded products!");
+          console.log("[Firebase Seeding] Successfully seeded default products!");
+        } else {
+          // Check if any default products are missing in Firestore and add them.
+          // Never delete or overwrite existing products or custom edits.
+          const existingProductIds = new Set(productsSnap.docs.map(d => d.id));
+          let seededMissingProductsCount = 0;
+          for (const product of fallbackProducts) {
+            if (!existingProductIds.has(product.id)) {
+              await setDoc(doc(db, "products", product.id), product);
+              seededMissingProductsCount++;
+            }
+          }
+          if (seededMissingProductsCount > 0) {
+            console.log(`[Firebase Seeding] Seeded ${seededMissingProductsCount} missing default products.`);
+          }
         }
       } catch (err) {
         console.warn("[Firebase Seeding] Could not auto-seed products:", err);

@@ -121,7 +121,7 @@ function AdminChatbot() {
         <div className="p-8 text-center text-muted-foreground animate-pulse">Loading chatbot rules...</div>
       ) : (
         <div className="space-y-3">
-          {rules.map((r, i) => (
+          {rules.filter(r => r.track === "skin").map((r, i) => (
             <div key={r.id || i} className="rounded-2xl border border-border bg-card p-5 grid lg:grid-cols-[1fr_auto_1fr_auto] items-center gap-4 hover:shadow-xs transition-shadow">
               <div className="space-y-1 col-span-1">
                 <div className="flex items-center gap-2">
@@ -158,7 +158,7 @@ function AdminChatbot() {
             </div>
           ))}
 
-          {rules.length === 0 && (
+          {rules.filter(r => r.track === "skin").length === 0 && (
             <div className="rounded-2xl border-2 border-dashed border-border bg-card p-10 text-center">
               <Sparkles className="size-6 mx-auto text-muted-foreground" />
               <div className="mt-3 font-medium">No Custom Rules Configured</div>
@@ -178,19 +178,6 @@ function AdminChatbot() {
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="rule-track">Concern Category (Track)</Label>
-              <select
-                id="rule-track"
-                value={track}
-                onChange={e => setTrack(e.target.value as "skin" | "hair")}
-                className="w-full text-sm rounded-full bg-muted/60 px-4 py-2.5 focus:outline-none border border-input"
-                required
-              >
-                <option value="skin">Skin</option>
-                <option value="hair">Hair</option>
-              </select>
-            </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="rule-if">If User Selects Concerns (comma-separated)</Label>

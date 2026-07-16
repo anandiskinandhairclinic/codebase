@@ -8,20 +8,28 @@ import { toast } from "sonner";
 
 type Msg = { from: "bot" | "user"; text: string };
 
-const skinConcerns = [
+export const skinConcerns = [
   "Acne", 
   "Pigmentation", 
-  "Dry Skin", 
-  "Oily Skin", 
-  "Sensitive Skin", 
   "Fine Lines", 
-  "Dark Spots",
-  "Open Pores",
-  "Sunburn & Tan",
-  "Under-Eye Circles",
-  "Uneven Texture",
-  "Acne Scars"
+  "Dark Spots", 
+  "Open Pores", 
+  "Sunburn & Tan", 
+  "Under-Eye Circles", 
+  "Uneven Texture", 
+  "Acne Scars",
+  "Dullness / Brightening"
 ];
+
+export const skinTypesList = [
+  "Oily Skin",
+  "Dry Skin",
+  "Sensitive Skin",
+  "Combination Skin",
+  "Normal Skin"
+];
+
+export const skinConcernsList = skinConcerns;
 
 const hairConcerns = [
   "Hair Fall", 
@@ -59,7 +67,7 @@ const defaultChatbotRules: ChatbotRule[] = [
   { track: "hair", if: ["Thin Hair"], then: ["Root Revive Serum", "PRP Hair Consultation"] }
 ];
 
-function recommend(track: "skin" | "hair", picks: string[], rules: ChatbotRule[]): string[] {
+function recommend(track: "skin" | "hair", picks: string[], rules: ChatbotRule[], products: Product[]): string[] {
   const has = (k: string) => picks.includes(k);
   const recs: string[] = [];
 
@@ -71,6 +79,13 @@ function recommend(track: "skin" | "hair", picks: string[], rules: ChatbotRule[]
     const matches = rule.if.length > 0 && rule.if.every(cond => has(cond));
     if (matches) {
       recs.push(...rule.then);
+    }
+  });
+
+  // Find products matching the concerns
+  products.forEach(product => {
+    if (product.concerns && product.concerns.some(c => has(c))) {
+      recs.push(product.name);
     }
   });
 
@@ -131,7 +146,7 @@ export function Chatbot({ open: propOpen, setOpen: propSetOpen }: ChatbotProps =
   const open = propOpen !== undefined ? propOpen : localOpen;
   const setOpen = propSetOpen !== undefined ? propSetOpen : setLocalOpen;
   const [step, setStep] = useState<"intro" | "concern" | "duration" | "type" | "additional" | "result">("intro");
-  const [track, setTrack] = useState<"skin" | "hair" | null>(null);
+  const [track, setTrack] = useState<"skin" | "hair" | null>("skin");
   const [selectedConcern, setSelectedConcern] = useState<string>("");
   const [selectedDuration, setSelectedDuration] = useState<string>("");
   const [selectedType, setSelectedType] = useState<string>("");
@@ -159,9 +174,33 @@ export function Chatbot({ open: propOpen, setOpen: propSetOpen }: ChatbotProps =
     });
   }, []);
 
+  useEffect(() => {
+    const handleOpen = () => setOpen(true);
+    window.addEventListener("open-chatbot", handleOpen);
+    return () => window.removeEventListener("open-chatbot", handleOpen);
+  }, [setOpen]);
+
+  const [showPromotion, setShowPromotion] = useState(false);
+
+  useEffect(() => {
+    const dismissed = sessionStorage.getItem("skin_quiz_promo_dismissed");
+    if (!open && !dismissed) {
+      const timer = setTimeout(() => {
+        setShowPromotion(true);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (open) {
+      setShowPromotion(false);
+    }
+  }, [open]);
+
   const reset = () => { 
     setStep("intro"); 
-    setTrack(null); 
+    setTrack("skin"); 
     setSelectedConcern("");
     setSelectedDuration("");
     setSelectedType("");
@@ -181,48 +220,94 @@ export function Chatbot({ open: propOpen, setOpen: propSetOpen }: ChatbotProps =
 
   const picks = [
     selectedConcern,
-    selectedType !== "Normal / Combination" && selectedType !== "Normal / Dry" ? selectedType : "",
+    selectedType,
+    selectedType === "Normal / Combination" ? "Normal Skin" : "",
+    selectedType === "Normal / Combination" ? "Combination Skin" : "",
     selectedAdditional !== "None" ? selectedAdditional : ""
   ].filter(Boolean);
 
   return (
     <>
-      <button
-        onClick={() => setOpen(!open)}
-        className="fixed bottom-6 right-6 z-50 size-14 grid place-items-center rounded-full bg-primary text-primary-foreground shadow-soft hover:scale-105 transition-transform cursor-pointer"
-        aria-label="Skin & Hair guide"
-      >
-        {open ? <X /> : <Bot className="size-6" />}
-      </button>
+      <AnimatePresence>
+        {showPromotion && (
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-6 left-6 z-40 max-w-[320px] rounded-2xl bg-white border border-[#ecdcc9] p-4 shadow-card flex gap-3 items-start max-sm:bottom-4 max-sm:left-4 max-sm:right-4 max-sm:max-w-none"
+          >
+            <div className="size-9 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+              <Sparkles className="size-4 animate-pulse text-primary" />
+            </div>
+            <div className="flex-grow space-y-1.5 text-xs text-foreground/80">
+              <div className="font-semibold text-xs text-[#5c4a37]">Smart Skin Analysis Quiz</div>
+              <p className="leading-relaxed">Get a personalized clinical routine recommended by our dermatologist in 60 seconds.</p>
+              <div className="flex gap-2.5 pt-1">
+                <button
+                  onClick={() => {
+                    setShowPromotion(false);
+                    setOpen(true);
+                  }}
+                  className="bg-primary text-primary-foreground font-semibold px-3 py-1.5 rounded-full hover:bg-primary/95 transition-colors cursor-pointer text-[10px]"
+                >
+                  Start Quiz
+                </button>
+                <button
+                  onClick={() => {
+                    setShowPromotion(false);
+                    sessionStorage.setItem("skin_quiz_promo_dismissed", "true");
+                  }}
+                  className="text-muted-foreground hover:text-foreground font-medium px-2 py-1.5 cursor-pointer text-[10px]"
+                >
+                  Maybe later
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.96 }}
+            initial={{ opacity: 0, x: -20, scale: 0.96 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: -20, scale: 0.96 }}
             transition={{ duration: 0.25 }}
-            className="fixed bottom-24 right-6 z-50 w-[min(92vw,380px)] rounded-3xl bg-card shadow-card border border-border overflow-hidden"
+            className="fixed bottom-6 left-6 z-50 w-[min(92vw,380px)] rounded-3xl bg-card shadow-card border border-border overflow-hidden max-sm:left-1/2 max-sm:-translate-x-1/2"
           >
-            <div className="px-5 py-4 bg-primary text-primary-foreground flex items-center gap-3">
-              <Sparkles className="size-5" />
-              <div>
-                <div className="font-display text-lg leading-tight">Skin & Hair Guide</div>
-                <div className="text-xs opacity-80">by Anandi Clinic</div>
+            <div className="px-5 py-4 bg-primary text-primary-foreground flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Sparkles className="size-5" />
+                <div>
+                  <div className="font-display text-lg leading-tight">Skin Guide</div>
+                  <div className="text-xs opacity-80">by Anandi Clinic</div>
+                </div>
               </div>
+              <button 
+                onClick={() => setOpen(false)} 
+                className="p-1 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white/90 hover:text-white"
+                aria-label="Close Chat"
+              >
+                <X className="size-5" />
+              </button>
             </div>
             
             <div className="p-5 max-h-[440px] overflow-y-auto space-y-4 text-sm">
               {step === "intro" && (
                 <>
-                  <Msg from="bot">Hi! I'm Anandi Clinic's skin & hair guide. Let's find your ideal personalized routine.</Msg>
-                  <div className="grid grid-cols-2 gap-2">
-                    {(["skin", "hair"] as const).map((t) => (
-                      <button key={t} onClick={() => { setTrack(t); setStep("concern"); }}
-                        className="rounded-2xl border border-border bg-muted/40 hover:bg-[#faf6f0] hover:border-primary/50 py-4 capitalize font-medium text-[#5c4a37] cursor-pointer transition-all">
-                        {t} Analyzer
-                      </button>
-                    ))}
+                  <Msg from="bot">Hi! I'm Anandi Clinic's skin guide. Let's find your ideal personalized routine.</Msg>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={() => {
+                        setTrack("skin");
+                        setStep("concern");
+                      }}
+                      className="w-full rounded-2xl border border-border bg-muted/40 hover:bg-[#faf6f0] hover:border-primary/50 py-4 font-semibold text-[#5c4a37] cursor-pointer transition-all text-center flex items-center justify-center gap-2"
+                    >
+                      <Sparkles className="size-4" /> Start Skin Analysis
+                    </button>
                   </div>
                 </>
               )}
@@ -350,7 +435,7 @@ export function Chatbot({ open: propOpen, setOpen: propSetOpen }: ChatbotProps =
               {step === "result" && track && (
                 <>
                   <div className="rounded-2xl bg-white border border-[#ecdcc9]/60 p-3.5 space-y-2 shadow-xs">
-                    <div className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Your Skin & Hair Profile</div>
+                    <div className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Your Skin Profile</div>
                     <div className="flex flex-wrap gap-1.5 pt-1">
                       <span className="text-[10px] px-2.5 py-1 rounded-full bg-primary/10 text-primary font-semibold">{selectedConcern}</span>
                       <span className="text-[10px] px-2.5 py-1 rounded-full bg-[#f4ece1] text-[#8a7560] font-semibold">{selectedDuration}</span>
@@ -363,7 +448,7 @@ export function Chatbot({ open: propOpen, setOpen: propSetOpen }: ChatbotProps =
 
                   <Msg from="bot">Based on your consultation details, we recommend the following clinical routine:</Msg>
                   <ul className="space-y-2">
-                    {recommend(track, picks, chatbotRules).map((r) => {
+                    {recommend(track, picks, chatbotRules, products).map((r) => {
                       const hasProduct = products.some(p => p.name.toLowerCase() === r.toLowerCase());
                       return (
                         <li key={r} className="rounded-2xl bg-white border border-[#ecdcc9]/50 p-3.5 flex items-center justify-between shadow-xs gap-3">

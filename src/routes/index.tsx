@@ -74,8 +74,13 @@ function Home() {
               <Button asChild size="lg" className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground px-7 h-12">
                 <Link to="/appointment">Book Consultation <ArrowRight className="ml-1 size-4" /></Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="rounded-full h-12 border-foreground/20 hover:bg-[#faf6f0]">
-                <Link to="/contact">Free Skin Analysis</Link>
+              <Button
+                onClick={() => window.dispatchEvent(new CustomEvent("open-chatbot"))}
+                size="lg"
+                variant="outline"
+                className="rounded-full h-12 border-[#5c4a37]/20 hover:bg-[#faf6f0] cursor-pointer flex items-center gap-1.5 text-foreground/80 hover:text-foreground transition-colors"
+              >
+                Smart Skin Quiz <Sparkles className="size-4 text-primary animate-pulse" />
               </Button>
             </div>
             <div className="mt-10 grid grid-cols-3 gap-6 max-w-md">

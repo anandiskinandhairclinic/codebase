@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, X, Stethoscope, ShoppingBag } from "lucide-react";
+import { Menu, X, Stethoscope, ShoppingBag, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
@@ -58,7 +58,12 @@ export function Header() {
           </button>
 
           <div className="hidden lg:flex items-center gap-2">
-            <Button asChild variant="ghost" className="rounded-full"><Link to="/admin">Admin</Link></Button>
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent("open-chatbot"))}
+              className="rounded-full border border-border/80 hover:bg-[#faf6f0] px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground cursor-pointer flex items-center gap-1.5 transition-colors"
+            >
+              Skin Quiz <Sparkles className="size-3.5 text-primary animate-pulse" />
+            </button>
             <Button asChild className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"><Link to="/appointment">Book Consult</Link></Button>
           </div>
 
@@ -74,6 +79,15 @@ export function Header() {
             {nav.map((n) => (
               <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="py-1.5">{n.label}</Link>
             ))}
+            <button
+              onClick={() => {
+                setOpen(false);
+                window.dispatchEvent(new CustomEvent("open-chatbot"));
+              }}
+              className="text-left py-1.5 text-foreground cursor-pointer flex items-center gap-1.5 font-medium"
+            >
+              Skin Quiz <Sparkles className="size-3.5 text-primary animate-pulse" />
+            </button>
             <Link to="/appointment" onClick={() => setOpen(false)} className="mt-2 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground px-4 py-2.5 text-sm">Book Consult</Link>
           </div>
         </div>

@@ -102,6 +102,7 @@ export type Product = {
   ingredients: string[];
   blurb: string;
   imageUrl?: string;
+  concerns?: string[];
 };
 
 export type BeforeAfterItem = {
